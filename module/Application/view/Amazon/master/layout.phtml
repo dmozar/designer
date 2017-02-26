@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title>Title</title>
+    <link href="https://fonts.googleapis.com/css?family=Poiret+One|Roboto" rel="stylesheet">
+    <?= Minty\Assets\AssetsController::CSS() ?>
+  </head>
+
+  <body>
+      
+      <header>
+          
+          <?php echo $this->getServiceLocator()->get('NavigationHelper')->html() ?>
+      </header>
+
+      <?php echo $ViewModel->html(); ?>
+      
+      <?php echo Minty\Application::$Profiler; ?>
+      
+      
+      <?= Minty\Assets\AssetsController::JS() ?>
+      <script src="<?=assets_url('assets/js/jquery-ui.min.js')?>"></script>
+      <script src="<?=assets_url('assets/plugins/tinymce_4.5.4/js/tinymce/tinymce.min.js')?>"></script>
+  </body>
+</html>

@@ -1,0 +1,54 @@
+{
+    "name": "minty/skeleton-application",
+    "description": "Skeleton Application for Minty Framework mvc applications",
+    "type": "project",
+    "license": "BSD-3-Clause",
+    "keywords": [
+        "framework",
+        "mvc",
+        "minty"
+    ],
+    "homepage": "http://minty.com/",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "require": {
+        "php": "^5.6 || ^7.0",
+        "rwoverdijk/assetmanager": "1.*",
+        "verot/class.upload.php": "dev-master",
+        "eventviva/php-image-resize": "1.6.*",
+        "doctrine/orm": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Application\\": "module/Application/src/",
+            
+            "Minty\\":"vendor/minty/",
+            "Minty\\MVC\\":"vendor/minty/minty-mvc/src/",
+            "Minty\\Route\\": "vendor/minty/minty-route/src/",
+            "Minty\\Factory\\": "vendor/minty/minty-factory/src/",
+            "Minty\\File\\": "vendor/minty/minty-file/src/",
+            "Minty\\Directory\\": "vendor/minty/minty-directory/src/",
+            "Minty\\Event\\": "vendor/minty/minty-event/src/",
+            "Minty\\View\\": "vendor/minty/minty-view/src/",
+            "Minty\\Extension\\": "vendor/minty/minty-extension/src/",
+            "Minty\\Assets\\": "vendor/minty/minty-assets/src/",
+            "Minty\\Type\\": "vendor/minty/minty-type/src/",
+            "Minty\\MySQL\\": "vendor/minty/minty-mysql/src/",
+            "Minty\\Output\\": "vendor/minty/minty-output/src/",
+            "Minty\\Session\\": "vendor/minty/minty-session/src/",
+            "Minty\\Crypt\\": "vendor/minty/minty-crypt/src/",
+            "Minty\\Doctrine\\": "vendor/minty/minty-doctrine/src/",
+            "Minty\\Service\\": "vendor/minty/minty-service/src/"
+        },
+        "classmap": [
+            
+        ]
+    },
+    "extra": [
+
+    ],
+    "scripts": {
+
+    }
+}
+

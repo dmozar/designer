@@ -1,0 +1,90 @@
+<div class="editor-wrap">
+    <div class="editor-controlls pinstart pinparent pintop">
+        <ul class="clear">
+            <li id="ec-undo" class="ignore"><i class="fa fa-undo" aria-hidden="true"></i></li>
+            <li id="ec-redo" class="ignore"><i class="fa fa-repeat" aria-hidden="true"></i></li>
+            <li id="ec-pointer"><i class="fa fa-mouse-pointer" aria-hidden="true"></i></li>
+            <li id="ec-text"><i class="fa fa-font" aria-hidden="true"></i></li>
+            <li id="ec-img"><i class="fa fa-picture-o" aria-hidden="true"></i></li>
+            <li id="ec-link"><i class="fa fa-link" aria-hidden="true"></i></li>
+            <li id="ec-delete" class="ignore"><i class="fa fa-trash-o" aria-hidden="true"></i></li>
+            <li id="ec-background" class="ignore"><i class="fa fa-shield" aria-hidden="true"></i></li>
+            <li id="ec-video" class="ignore"><i class="fa fa-film" aria-hidden="true"></i></li>
+            
+        </ul>
+        <span class="pin"><i class="fa fa-thumb-tack" aria-hidden="true"></i></span>
+    </div>
+
+    <div id="design-editor" class="editor noselect" spellcheck="false"></div>
+
+
+    
+    
+    <div class="templates">
+        
+        <div class="template-text" data-title="Add/Edit Text" data-size="medium">
+            <div class="form-group">
+                <label>Text</label>
+                <textarea name="text" class="editor-text" ></textarea>
+            </div>
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitText(this);">OK</button>
+            </div>
+        </div>
+        
+        
+        <div class="template-link" data-title="Add/Edit Link" data-size="small">
+            <div class="form-group">
+                <label>URL</label>
+                <input type="url" name="url" value="" placeholder="http://www.site.com" />
+            </div>
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitLink(this);">OK</button>
+            </div>
+        </div>
+        
+        <div class="template-video" data-title="Add/Edit Video" data-size="medium">
+            <div class="form-group">
+                <label>Youtube URL</label>
+                <input type="url" name="url" value="" placeholder="http://www.site.com" />
+            </div>
+            <div class="form-group">
+                <label>Embed code</label>
+                <textarea name="code" class="editor-text"></textarea>
+            </div>
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitVideo(this);">OK</button>
+            </div>
+        </div>
+        
+        <div class="template-image" data-title="Add/Edit Image" data-size="medium">
+            
+            <div class="form-group">
+                <label>Image url</label>
+                <input type="url" name="url" value="" placeholder="Image link: http://site.com/image.jpg" maxlength="400" onchange="Editor.PreviewImage(this)"  />
+                <img class="img-prev" src="<?= assets_url('img/no-img.png')?>" data-src="<?= assets_url('img/no-img.png')?>" style="max-height:225px;max-width:300px;" />
+            </div>
+            
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitImage(this);">OK</button>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <div class="editor-footer pinstart pinparent pinbottom">
+        <span class="ef"><label>width:</label><input id="width" type="text" name="width" value="0" style="width:50px;" /></span>
+        <span class="ef"><label>height:</label><input id="height" type="text" name="height" value="0" style="width:50px;" /></span>
+        <span class="ef"><label>z-index:</label><input id="zindex" type="text" name="zindex" value="1" style="width:50px;" /></span>
+        <span class="ef"><label>e-width:</label><input id="ewidth" type="text" name="width" value="0" style="width:50px;" /></span>
+        <span class="ef"><label>e-height:</label><input id="eheight" type="text" name="height" value="0" style="width:50px;" /></span>
+        <span class="pin"><i class="fa fa-thumb-tack" aria-hidden="true"></i></span>
+        <span class="resolution"><select></select></span>
+    </div>
+    
+</div>

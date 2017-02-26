@@ -1,0 +1,17 @@
+/vendor/rwoverdijk/
+/vendor/psr/
+/vendor/zendframework/
+/vendor/san/
+/vendor/symfony/
+/vendor/bin/
+/vendor/beberlei/
+/vendor/container-interop/
+/vendor/kriswallsmith/
+/vendor/doctrine/
+/vendor/composer/
+/data/cache/
+/nbproject/private/
+/data/logs/
+/data/proxies/
+/vendor/eventviva/
+/vendor/verot/

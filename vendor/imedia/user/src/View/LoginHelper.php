@@ -1,0 +1,94 @@
+<?php namespace Imedia\User\View;
+
+use Minty\View\Interfaces\ViewInterface;
+use Minty\View\AbstractView;
+use Minty\Output\OutputManager;
+use Minty\Session\SessionManager;
+
+/**
+ * 
+ */
+class LoginHelper extends AbstractView implements ViewInterface {
+    
+    
+    /**
+     *
+     * @var array 
+     */
+    private $options = [];
+    
+    
+    /**
+     * 
+     */
+    public function __construct() { }
+    
+    
+    
+    /**
+     * 
+     * @param type $request
+     * @param type $options
+     * @return type
+     */
+    public function __invoke( $configs = array()) {
+        
+        $Service = $this->getServiceLocator()->get('UserService');
+        
+        $post = $this->getHttp()->getPost();
+        
+        $Service->setPost( $post );
+        $Service->setModuleConfigs( $configs );
+
+        $RouteService   = $this->getServiceLocator()->Route;
+        $Route          = $RouteService->Route();
+        
+        $params = $Route->params_from_route();
+
+        $options = [
+            'form'          => $params,
+            'submit'        => $params['submit'],
+            'message'       => null,
+            'status'        => true,
+            'error_filed'   => null,
+            'error_value'   => null,
+            'callback'      => 'Login.Error'
+        ];
+        
+         if($params['submit']){
+            $options['status']      = $Service->Login();
+            $options['message']     = $Service->GetMessage();
+            $options['error_filed'] = $Service->getErrorField(); 
+            $options['error_value'] = $Service->getErrorValue(); 
+            $options['callback']    = 'Login.Success';
+        }
+        
+        $ViewModel =  $this->getView($options);
+        $ViewModel->get('login');
+        
+        
+        
+        if( $options['submit'] )
+            if(! isset($post['callback']) )
+                OutputManager::get()->view( $ViewModel );
+            else {
+                OutputManager::get()->json( $options );
+            }
+        
+        return $ViewModel;
+        
+    }
+    
+    
+    
+    /**
+     * 
+     * @param type $request
+     * @param type $options
+     * @return type
+     */
+    public function create($options = array() ) {
+        return $this($options);
+    }
+    
+}

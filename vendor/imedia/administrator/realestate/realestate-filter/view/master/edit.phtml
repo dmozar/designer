@@ -1,0 +1,15 @@
+<div class="container">
+    
+    <div class="row">
+        
+        <div class="col-md-6">
+            <?php echo Minty\Helper\Widget::Cretate($this->specifications[0]->getType()->getName() . ': ' . language('edit_filter'), 't1', $this->view('filter_edit_form',[], true) )?>
+        </div>
+        
+        <div class="col-md-6">
+            <?php echo Minty\Helper\Widget::Cretate('Filters', 't2',minty_table( Minty\Router::FromChilde('Administrator\RealEstate\Filter','grid', 'grid2', [], [$this->type->getID()]), '#typelisting', 250, 25 ))?>
+        </div>
+        
+    </div>
+    
+</div>

@@ -1,0 +1,71 @@
+<div class="padd">
+    <form action="<?= Minty\Router::FromChilde('Administrator\RealEstate\Filter', 'edit', 'submit', [ $this->filter->getID() ] ) ?>" method="post" id="typeedit" class="ajaxform">
+
+        <div class="form-group">
+            <label for="type"><?=language('Specification')?></label>
+            <select name="<?=language('specification')?>" id="type" class="form-control">
+                
+                <?php foreach ($this->specifications as $spec):?> 
+                <option value="<?=$spec->getID()?>" <?=$spec->getID() == $this->filter->getSpecification()->getID() ? 'selected':''?> ><?=$spec->getName()?></option>
+                <?php endforeach; ?> 
+                
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="name"><?=language('Name')?> <span class="asterix"></span></label>
+            <input type="text" maxlength="120" id="name" class="form-control half" name="<?=language('name')?>" required value="<?=$this->filter->getName()?>" />
+        </div>
+        
+        <div class="form-group">
+            <label for="slug"><?=language('Slug')?> <span class="asterix"></span></label>
+            <input type="text" maxlength="120" id="slug" class="form-control half" name="<?=language('slug')?>" required value="<?=$this->filter->getSLug()?>" />
+        </div>
+        
+        
+        <div class="form-group">
+            <label for="position"><?=language('Position')?> <span class="asterix"></span></label>
+            <input type="text" maxlength="10" id="position" class="form-control small" name="<?=language('position')?>"  required value="<?=$this->filter->getPosition()?>" />
+        </div>
+        
+        <div class="form-group padd-top">
+            <label for="type"><?=language('TypeSelect')?></label>
+            <input type="text" id="type" class="form-control switch-el" name="<?=language('typeselect')?>" value="<?=$this->filter->getType()?>" data-multiple="1" data-multiplename="<?=language('TypeMultiple')?>" data-single="2" data-singlename="<?=language('TypeSingle')?>" data-list="multiple,single" />
+        </div>
+        
+        <div class="form-group padd-top">
+            <label for="status"><?=language('Status')?></label>
+            <input type="text" id="status" class="form-control switch-el" name="<?=language('status')?>" value="<?=$this->filter->getStatus()?>" data-off="0" data-offname="<?=language('StatusOff')?>" data-on="1" data-onname="<?=language('StatusOn')?>" data-list="off,on" />
+        </div>
+        
+        <div class="form-group clear">
+            
+            <div class="btn-group pull-right">
+                <a href="<?= Minty\Router::FromRoute('Administrator\RealEstate\Filter', 'index')?>" class="btn btn-primary"><?=language('Back')?></a>
+                <button type="submit" class="btn btn-primary"><?=language('Save')?></button>
+            </div>
+            
+        </div>
+        
+        
+    </form>
+</div>
+
+
+
+<div class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title" id="modal-title"><?=language('Warning')?></h4>
+      </div>
+      <div class="modal-body">
+        <p id="modal-text"><?=language('FilterEmptyText')?></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal"><?=language('Close')?></button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

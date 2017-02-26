@@ -1,0 +1,53 @@
+<div class="container" id="login">
+    <h1><?=language('Login')?></h1>
+    
+    
+    
+    <div class="row">
+          <div class="col-xs-6">
+              <form action="<?=  Minty\Router::FromChilde('Imedia\User', 'login', 'submit')?>" method="post" class="ajaxform" data-target="#login">
+                  <fieldset>
+                      <legend><?=language('UseYourAccount')?></legend>
+                      
+                      <div class="form-group clear">
+                          <div class="col-xs-6">
+                              <label for="email"><?=language('e-mail')?></label>
+                              <input class="form-control" type="email" id="email" name="<?=language('email')?>" maxlength="80" required placeholder="<?=language('EnterEmail')?>" />
+                          </div>
+                      </div>
+                      
+                      <div class="form-group clear">
+                          <div class="col-xs-6">
+                            <label for="password"><?=language('password')?></label>
+                            <input class="form-control" type="password" name="<?=language('password')?>" maxlength="80" required placeholder="<?=language('EnterPassword')?>" />
+                          </div>
+                      </div>
+                      
+                      <div class="form-group clear">
+                          <div class="col-xs-6">
+                              <button type="submit" class="btn btn-info"><?=language('Login')?></button>
+                          </div>
+                      </div>
+                      
+                      <?php if($this->message):?><div class="alert <?=$this->status ? 'alert-success' : 'alert-danger'?>"><?= $this->message ?></div><?php endif; ?> 
+                      
+                      <div class="form-text text-muted clear">
+                          <div class="col-xs-12">
+                              <?=language('ForgotPassword')?> <a href="/"><?=language('PasswordRecoveryLink')?></a>
+                          </div>
+                      </div>
+                      
+                  </fieldset>
+              </form>
+          </div>
+          <div class="col-xs-6">
+               <fieldset>
+                      <legend><?=language('DontHaveAccount')?></legend>
+                      
+                      <p><?=language('DontHaveAccountText')?></p>
+                      <p><a href="<?=Minty\Router::FromRoute('Imedia\User', 'registration')?>" class="btn btn-info"><?=language('MakeAccountLink')?></a></p>
+                  </fieldset>
+          </div>
+    </div>
+    
+</div>

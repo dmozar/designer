@@ -1,0 +1,8 @@
+<div class="container">
+    <h1>Real Estate</h1>
+    <?php if( $this->ads->total == 0):?> 
+    <?php $this->view('ads_not_found');?>
+    <?php else:?> 
+    <?php $this->partial('ad_box', $this->ads->result); ?>
+    <?php endif;?> 
+</div>

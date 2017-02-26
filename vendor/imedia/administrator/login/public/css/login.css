@@ -1,0 +1,68 @@
+body {
+    background: #3c6b71; 
+    background-image: url('../img/layout/login-bg.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    font-family: 'Arial', sans-serif;
+    height:100%;
+}
+
+html {
+    height:100%;
+}
+
+
+.clear:after {
+    content: "";
+    display:block;
+    clear: both;
+    zoom: 1;
+}
+
+.container {
+    max-width: 320px;
+    height: 100%;
+    min-height: 350px;
+    background: #3a3a3a;
+    margin:0;
+    -o-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+    -moz-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+    -ms-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+    -webkit-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+    -khtml-box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+    box-shadow: 4px 0px 5px 0px rgba(0,0,0,0.5);
+}
+
+.page-header {
+    border-bottom: none;
+}
+
+h1 {
+    font-family: 'Poiret One', cursive;
+    margin-bottom: 30px;
+    font-weight: 400;
+    color: #077983;
+}
+
+h2 {
+    font-family: 'Poiret One', cursive;
+    margin-bottom: 15px;
+    font-weight: 600;
+    font-size:26px;
+}
+
+.input-group-addon {
+    background: #cccccc;
+    color: #ffffff;
+}
+
+.form-control {
+    border: 1px solid #fff;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #67060d;
+    border-color: #680309;
+}

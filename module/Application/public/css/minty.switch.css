@@ -1,0 +1,158 @@
+/* Animation */
+.pulse {
+    width: 10px;
+    height: 10px;
+    border: 5px solid #333;
+    -webkit-border-radius: 30px;
+    -moz-border-radius: 30px;
+    border-radius: 30px;
+    background-color: #716f42;
+    z-index: 10;
+    position: absolute;
+    left: 50%;
+    margin-left: -5px;
+    top:5px;
+}
+.dot {
+    display:none;
+    border: 6px solid #cc9109;
+    background: transparent;
+    -webkit-border-radius: 60px;
+    -moz-border-radius: 60px;
+    border-radius: 60px;
+    height: 50px;
+    width: 50px;
+    -webkit-animation: pulse 3s ease-out;
+    -moz-animation: pulse 3s ease-out;
+    animation: pulse 3s ease-out;
+    -webkit-animation-iteration-count: infinite;
+    -moz-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    margin-left: -25px;
+    z-index: 1;
+    opacity: 0;
+}
+
+@-moz-keyframes pulse {
+ 0% {
+    -moz-transform: scale(0);
+    opacity: 0.0;
+ }
+ 25% {
+    -moz-transform: scale(0);
+    opacity: 0.1;
+ }
+ 50% {
+    -moz-transform: scale(0.1);
+    opacity: 0.3;
+ }
+ 75% {
+    -moz-transform: scale(0.5);
+    opacity: 0.5;
+ }
+ 100% {
+    -moz-transform: scale(1);
+    opacity: 0.0;
+ }
+}
+
+@-webkit-keyframes "pulse" {
+ 0% {
+    -webkit-transform: scale(0);
+    opacity: 0.0;
+ }
+ 25% {
+    -webkit-transform: scale(0);
+    opacity: 0.1;
+ }
+ 50% {
+    -webkit-transform: scale(0.1);
+    opacity: 0.3;
+ }
+ 75% {
+    -webkit-transform: scale(0.5);
+    opacity: 0.5;
+ }
+ 100% {
+    -webkit-transform: scale(1);
+    opacity: 0.0;
+ }
+}
+
+.switch-wrap {
+    display:block;
+    position: relative;
+    width:100%;
+    top: -20px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none; 
+     -khtml-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    }
+    .switch-wrap input {
+        position: absolute;
+        opacity: 0;
+        visibility: hidden;
+    }
+    .switch-wrap:after {
+        content: "";
+        clear: both;
+        display:block;
+    }
+    .switch-wrap .switch-opt {
+        position: relative;
+        display:inline-block;
+        float:left;
+        height:10px;
+        cursor: pointer;
+        }
+        .switch-wrap .switch-opt em {
+            display:block;
+            position: absolute;
+            top:-15px;
+            font-size:13px;
+            font-style: normal;
+            left:50%;
+            color:#696969;
+            -o-transform: translateX(-50%);
+            -moz-transform: translateX(-50%);
+            -ms-transform: translateX(-50%);
+            -webkit-transform: translateX(-50%);
+            -khtml-transform: translateX(-50%);
+            transform: translateX(-50%);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .switch-wrap .switch-opt:hover em {
+            color: #fff;
+        }
+        .switch-wrap .switch-opt.active em {
+            color: #b56700;
+        }
+        .switch-wrap .switch-opt.active .pulse {
+            border: 5px solid #cc9109;
+        }
+        .switch-wrap .switch-opt.active .dot {
+            display:block;
+        }
+        .switch-wrap .switch-opt:before {
+            content: "";
+            display: block;
+            position: absolute;
+            left: 0px;
+            right: 0px;
+            height: 1px;
+            background: #272727;
+            bottom: 0px;
+        }
+        .switch-wrap .switch-opt:nth-child(2):before {
+            left:50%;
+        }
+        .switch-wrap .switch-opt:last-child:before {
+            right:50%;
+        }

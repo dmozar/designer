@@ -1,0 +1,27 @@
+<div class="padd">
+    <form action="" method="post" id="typeedit" class="ajaxform">
+
+        <div class="form-group">
+            <label for="type"><?=language('Type')?></label>
+            <select name="<?=language('specification')?>" id="type" class="form-control" required>
+                <option value=""> -- <?=language('SelectCategory')?> -- </option>
+                <?php foreach ($this->types as $type):?> 
+                <option value="<?=$type->getID()?>" data-url="<?= Minty\Router::FromChilde('Administrator\RealEstate\Filter', 'add', 'type_select', [], [$type->getID()] ) ?>"><?=$type->getName()?></option>
+                <?php endforeach; ?> 
+                
+            </select>
+        </div>
+        
+        
+        <div class="form-group clear">
+            
+            <div class="btn-group pull-right">
+                <a href="<?= Minty\Router::FromRoute('Administrator\RealEstate\Filter', 'index')?>" class="btn btn-primary"><?=language('Back')?></a>
+                <button type="button" class="btn btn-primary" data-redirect="#type"><?=language('Next')?></button>
+            </div>
+            
+        </div>
+        
+        
+    </form>
+</div>

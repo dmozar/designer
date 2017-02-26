@@ -1,0 +1,91 @@
+<div class="container" id="registration">
+    <h1><?=language('Registration')?></h1>
+
+    <div class="row">
+        <div class="col-xs-6">
+            <form action="<?=  Minty\Router::FromChilde('Imedia\User', 'registration', 'submit')?>" method="post" class="ajaxform" data-target="#registration">
+                <fieldset>
+                    <div class="text-info padd">Formular za kreiranje naloga. Polja sa zvezdicom su obavezna polja.</div>
+                    <div class="form-group clear">
+                        <div class="col-xs-6">
+                            <label for="first_name"><?=language('FirstName')?></label>
+                            <input class="form-control" type="text" id="first_name" name="<?=language('first_name')?>" maxlength="30" required placeholder="<?=language('EnterFirstName')?>" />
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="last_name"><?=language('LastName')?></label>
+                            <input class="form-control" type="text" id="last_name" name="<?=language('last_name')?>" maxlength="30" required placeholder="<?=language('EnterLastName')?>" />
+                        </div>
+                    </div>
+
+                    <div class="form-group clear">
+                        <div class="col-xs-6">
+                            <label for="email"><?=language('e-mail')?></label>
+                            <input class="form-control" type="email" id="email" name="<?=language('email')?>" maxlength="80" required placeholder="<?=language('EnterEmail')?>" />
+                        </div>
+                        <div class="col-xs-6">
+                            <label for="phone"><?=language('Phone')?></label>
+                            <input class="form-control" type="text" id="phone" name="<?=language('phone')?>" maxlength="80" required placeholder="<?=language('EnterPhone')?>" />
+                        </div>
+                    </div>
+
+                    <div class="form-group clear">
+                        <div class="col-xs-6">
+                          <label for="password"><?=language('Password')?></label>
+                          <input class="form-control" type="password" name="<?=language('password')?>" maxlength="80" required placeholder="<?=language('EnterPassword')?>" />
+                        </div>
+                        <div class="col-xs-6">
+                          <label for="rpassword"><?=language('ReenterPassword')?></label>
+                          <input class="form-control" type="password" name="<?=language('rpassword')?>" maxlength="80" required placeholder="<?=language('ReenterPassword')?>" />
+                        </div>
+                    </div>
+
+                    <div class="form-group clear">
+                        <div class="col-xs-6">
+                            <button type="submit" class="btn btn-info"><?=language('Registration')?></button>
+                        </div>
+                    </div>
+
+                    <?php if($this->message):?> 
+                    <div class="alert <?=$this->status ? 'alert-success' : 'alert-danger'?>"><?= $this->message ?></div>
+                    <?php endif; ?> 
+
+                </fieldset>
+            </form>
+        </div>
+        
+        <div class="col-xs-6 right-side">
+            <div class="register-now"></div>
+            <h2>Kreiranje naloga</h2>
+            <p>Kreiranjem naloga dobijate nekoliko beneficija koje nemate ako niste ulogovani na sajtu.</p>
+            <ul>
+                <li>Možete postaviti besplatni mali oglas.</li>
+                <li>Možete postaviti pitanje oglašivaču oglasa.</li>
+                <li>Možete odabrati oglase za praćenje.</li>
+                <li>Možete kreirati nalog za obaveštenje o postavljanju oglasa koji vas zanima.</li>
+            </ul>
+            
+            <div class="separator"></div>
+            
+            <h2>Za agente nekretnina</h2>
+            <p>Dodajte sebe ili svoju agenciju u naš imenik i omogućite da vas klijenti pronađu brzo i jednostavno.</p>
+            <div class="clear"><a href="/" class="pull-left btn btn-info">Dodaj u imenik</a></div>
+            
+            <div class="separator"></div>
+            
+            <h2>Imate agenciju</h2>
+            <p>Kreirajte vašu stranicu sa vašim logom na kome će izlaziti samo vaši postavljeni oglasi</p>
+            <div class="clear"><a href="/" class="pull-left btn btn-info">Kreiraj tvoju stranicu</a></div>
+        </div>
+        
+        
+        <div class="col-xs-12 nopadd">
+            <div class="separator black"></div>
+            <div class=" infotext">
+                <p>Mali oglasi na ovom sajtu su <b>besplatni</b>. Agencijske strane, kao i imenik su besplatni u promotivnom periodu do kraja 2017 godine.</p>
+            </div>
+        </div>
+        
+          
+    </div>
+    
+</div>

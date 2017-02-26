@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="col-md-6">
+        <?php 
+            $options = [
+                language('AddNewSpecification') => Minty\Router::FromRoute('Administrator\RealEstate\Specification', 'add')
+            ];
+        ?> 
+        <?php echo Minty\Helper\Widget::Cretate('Specifications', 'w1',minty_table( Minty\Router::FromRoute('Administrator\RealEstate\Specification', 'grid'), '#type', 250, 25 ), $options)?>
+    </div>
+
+    <div class="col-md-6">
+
+    </div>
+    
+</div>

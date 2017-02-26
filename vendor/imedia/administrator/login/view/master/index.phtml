@@ -1,0 +1,30 @@
+<div class="container">
+    <div class="page-header">
+        <h1>Login <br/><small>use your credential</small></h1>
+    </div>
+    
+    <form action="<?= Minty\Router::FromChilde('Imedia\User', 'login', 'submit')?>" method="post" class="ajaxform loginform">
+    
+        <input type="hidden" value="true" name="callback" />
+        
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1">@</span>
+                <input type="email" class="form-control" placeholder="Email" aria-describedby="basic-addon1" required name="<?=language('email')?>">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-addon" id="basic-addon1"><span class="glyphicon glyphicon-lock" aria-hidden="true"></span></span>
+                <input type="password" class="form-control" placeholder="Password" aria-describedby="basic-addon1" required name="<?=language('password')?>">
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary btn-lg btn-block">Login</button>
+        </div>
+    </form>
+    
+    
+</div>

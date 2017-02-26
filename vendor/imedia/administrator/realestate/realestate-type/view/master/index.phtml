@@ -1,0 +1,15 @@
+<div class="container">
+    <div class="col-md-6">
+        <?php 
+            $options = [
+                language('AddNewType') => Minty\Router::FromRoute('Administrator\RealEstate\Type', 'type_add')
+            ];
+        ?> 
+        <?php echo Minty\Helper\Widget::Cretate('Type listing', 'w1',minty_table( Minty\Router::FromRoute('Administrator\RealEstate\Type', 'grid'), '#type', 250, 25 ), $options)?>
+    </div>
+
+    <div class="col-md-6">
+
+    </div>
+    
+</div>

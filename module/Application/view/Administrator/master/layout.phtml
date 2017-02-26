@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="/favicon.ico">
+
+    <title><?= Minty\Event\EventManager::fromSEO('title')?></title>
+    
+    <link href="https://fonts.googleapis.com/css?family=Rubik" rel="stylesheet">
+    
+    <?= Minty\Assets\AssetsController::CDN_CSS() ?>
+    <?= Minty\Assets\AssetsController::CSS() ?>
+  </head>
+
+  <body>
+      
+      <div class="container-full">
+          
+          <div class="row">
+              
+              <div class="col-md-1 sidebar">
+                  
+                  
+                  <div class="user-box">
+                      <div class="user-name">Damir Mozar</div>
+                      <div class="user-img">
+                          <img src="https://media.nngroup.com/media/people/photos/Garrett_Goldfield_headshot.jpg.400x400_q95_autocrop_crop_upscale.jpg" />
+                      </div><!-- ./user-img -->
+                  </div><!-- ./user-box -->
+                  
+                  <div class="navigation noselect">
+                      
+                      <div class="nav-group">
+                          <div class="nav-item">
+                              <span><i class="fa fa-home" aria-hidden="true"></i> Dashobard</span>
+                              <div class="nav-subgroup">
+                                  <span><a href="<?=Minty\Router::FromRoute('Administrator\Home', 'home')?>"><?=language('Home')?></a></span>
+                              </div><!-- ./nav-subgroup -->
+                              
+                          </div><!-- ./nav-item -->
+                          
+                      </div><!-- ./nav-group-->
+                      
+                      <div class="nav-group">
+                          <div class="nav-item">
+                              <span><i class="fa fa-building-o" aria-hidden="true"></i> <?=language('RealEstate')?></span>
+                              <div class="nav-subgroup">
+                                  <span><a href="<?= Minty\Router::FromRoute('Administrator\RealEstate\Type', 'type')?>"><?=  language('Type')?></a></span>
+                                  <span><a href="<?= Minty\Router::FromRoute('Administrator\RealEstate\Specification', 'index')?>"><?=language('Specifications')?></a></span>
+                                  <span><a href="<?= Minty\Router::FromRoute('Administrator\RealEstate\Filter', 'index')?>"><?=language('Filters')?></a></span>
+                              </div><!-- ./nav-subgroup -->
+                              
+                          </div><!-- ./nav-item -->
+                          
+                      </div><!-- ./nav-group-->
+                      
+                  </div><!-- ./navigation -->
+                  
+                  
+              </div>
+              <div class="col-md-11 content">
+                  
+                  <div class="header">
+                      <h1><?= Minty\Event\EventManager::fromSEO('title')?></h1>
+                  </div><!-- ./header -->
+                  
+                  <div class="page">
+                      <?php echo $ViewModel->html(); ?>
+                  </div><!-- ./page -->
+
+              </div><!-- ./content -->
+              
+          </div>
+          
+      </div>
+
+      
+      <?php echo Minty\Application::$Profiler; ?>
+      <?= Minty\Assets\AssetsController::JS() ?>
+      <?= Minty\Assets\AssetsController::CDN_JS() ?>
+  </body>
+</html>

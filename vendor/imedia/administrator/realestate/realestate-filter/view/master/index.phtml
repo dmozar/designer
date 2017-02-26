@@ -1,0 +1,10 @@
+<div class="container">
+    <div class="col-md-12">
+        <?php 
+            $options = [
+                language('AddNewFilter') => Minty\Router::FromRoute('Administrator\RealEstate\Filter', 'add')
+            ];
+        ?> 
+        <?php echo Minty\Helper\Widget::Cretate('Filters', 'w1',minty_table( Minty\Router::FromRoute('Administrator\RealEstate\Filter', 'grid'), '#type', 250, 25 ), $options)?>
+    </div>
+</div>
