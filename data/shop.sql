@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.5.1deb1
+-- version 4.6.4
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Jan 22, 2017 at 09:48 PM
--- Server version: 5.7.16-0ubuntu2
--- PHP Version: 5.6.29-1+deb.sury.org~xenial+1
+-- Host: 127.0.0.1
+-- Generation Time: Feb 26, 2017 at 07:47 AM
+-- Server version: 5.7.14
+-- PHP Version: 5.6.25
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `realestates`
+-- Database: `shop`
 --
 
 -- --------------------------------------------------------
@@ -52,7 +52,7 @@ CREATE TABLE `ad` (
 --
 
 INSERT INTO `ad` (`id`, `title`, `description`, `price`, `area`, `bedrooms`, `baths`, `type_id`, `user_id`, `country_id`, `city_id`, `location_id`, `category_id`, `publish_category_id`, `date`, `status`, `position`, `tags`) VALUES
-(35, 'Beograd, Palilula, Karaburma, Patrisa Lumumbe', '<span style=\"color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;\">Predato za legalizaciju &ndash; U procesu legalizacije.</span><br style=\"color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;\" /><br style=\"color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;\" /><span style=\"color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;\">Odlična garsonjera na dobrom mestu. Blizu prodavnica, po&scaron;te, vrtića, &scaron;kole, doma zdravlja, prevoza.</span>', '18500.00', '200', 0, 0, 2, 4, 1, 1, 3, 1, 2, '2017-01-22 19:54:06', 0, 4, '');
+(35, 'Beograd, Palilula, Karaburma, Patrisa Lumumbe', '<span style="color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;">Predato za legalizaciju &ndash; U procesu legalizacije.</span><br style="color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;" /><br style="color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;" /><span style="color: #000000; font-family: Arial; font-size: 13px; line-height: 17px; background-color: #ffffff;">Odlična garsonjera na dobrom mestu. Blizu prodavnica, po&scaron;te, vrtića, &scaron;kole, doma zdravlja, prevoza.</span>', '18500.00', '200', 0, 0, 2, 4, 1, 1, 3, 1, 2, '2017-01-22 19:54:06', 0, 4, '');
 
 -- --------------------------------------------------------
 
@@ -584,7 +584,7 @@ ALTER TABLE `ad_images`
 -- AUTO_INCREMENT for table `ad_image_collections`
 --
 ALTER TABLE `ad_image_collections`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `ad_product_filters`
 --
