@@ -18,6 +18,27 @@ var EditorClass = function(){
      */
     this.selection = null;
     
+    
+    /**
+     * 
+     */
+    this.ActiveElement = null;
+    
+    /**
+     * 
+     */
+    this.lastSelection = null;
+    
+    /**
+     * 
+     */
+    this.selectionLimit = 20;
+    
+    /**
+     * 
+     */
+    this.lastHistoryIndx = 0;
+    
     /**
      * 
      */
@@ -34,7 +55,7 @@ var EditorClass = function(){
      */
     this.resolutions = {
         'desktop' : {
-            'width' : 1123,
+            'width' : 1120,
             'history': {},
             'hisindx': 0
         },
@@ -60,12 +81,32 @@ var EditorClass = function(){
         }
     };
     
+    /**
+     * 
+     */
     this.currentResolution = "desktop";
     
+    /**
+     * 
+     */
     this.maxHistory = 20;
     
+    /**
+     * 
+     */
+    this.grid = null;
     
+    /**
+     * 
+     */
+    this.gridIndx = 0;
     
+    /**
+     * 
+     */
+    this.gridStep = 40;
+    
+
     /**
      * 
      */
@@ -78,25 +119,28 @@ var EditorClass = function(){
         'link'      : '#ec-link',
         'delete'    : '#ec-delete',
         'background': '#ec-background',
-        'video'     : '#ec-video'
+        'video'     : '#ec-video',
+        'magic'     : '#ec-magic',
+        'expand'    : '#ec-expand',
+        'grid'      : '#ec-grid',
+        'center'    : '#ec-center'
     };
-    
-    this.clickedElement = null;
     
     /**
      * 
-     * @returns {undefined}
      */
+    this.clickedElement = null;
+    
+
+    // <editor-fold defaultstate="collapsed" desc="__initialize">
     var __initialize = function(){
 
         if(document.contentEditable != undefined && document.execCommand != undefined){ 
             alert("HTML5 Document Editing API Is Not Supported"); } else { Init(); }
     };
+    // </editor-fold>
     
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // <editor-fold defaultstate="collapsed" desc="Init">
     var Init = function(){
         
         self.etc = $('.editor');
@@ -106,30 +150,17 @@ var EditorClass = function(){
         self.Events();
         self.SizeHandler();
         self.Pin();
-        self.Reolution();
+        self.Resolution();
+        
+        self.etc.resizable({
+            handles: 's'
+        });
+        
        
     };
-    
-    
-    this.Reolution = function(){
-        
-        var select = self.etc.closest('.editor-wrap').find('.resolution select');
-        $.each(self.resolutions, function(i,e){
-            select.append('<option value="'+i+'">'+i+'</option>');
-        });
-        select.on('change', function(){
-            var t = ($(this).find('option:selected').val());
-            var resolution = self.resolutions[t];
-            $('#width').val(resolution.width).trigger('change');
-            self.currentResolution = t;
-        });
-    };
-    
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // </editor-fold> 
+
+    // <editor-fold defaultstate="collapsed" desc="Controls">
     this.Controls = function(){
         
         self.controls.undo          = $(self.controls.undo);
@@ -141,14 +172,258 @@ var EditorClass = function(){
         self.controls.delete        = $(self.controls.delete);
         self.controls.background    = $(self.controls.background);
         self.controls.video         = $(self.controls.video);
+        self.controls.magic         = $(self.controls.magic);
+        self.controls.expand        = $(self.controls.expand);
+        self.controls.grid          = $(self.controls.grid);
+        self.controls.center        = $(self.controls.center);
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Events">
+    this.Events = function(){
+        self.controls.pointer.on( 'click', self.Pointer );
+        self.controls.text.on   ( 'click', self.EditText );
+        self.controls.image.on  ( 'click', self.EditImage );
+        self.controls.link.on   ( 'click', self.EditLink );
+        self.controls.delete.on ( 'click', self.Remove );
+        self.controls.background.on ( 'click', self.EditBackground );
+        self.controls.video.on ( 'click', self.EditVideo );
+        self.controls.undo.on ( 'click', self.Undo );
+        self.controls.redo.on ( 'click', self.Redo );
+        self.controls.magic.on ( 'click', self.Magic );
+        self.controls.expand.on ( 'click', self.Expand );
+        self.controls.grid.on ( 'click', self.Grid );
+        
+        $('.editor-wrap, .btn-wrap').css('width',self.resolutions.desktop.width+'px');
+        
+        $('.editor-controlls li').on('click', function(){
+            setTimeout(function(){
+                self.ElementListener( self.etc.find('.group-element.active') );
+            },50);
+        } );
+        
+        $('#angle').on('change', function(){ self.Rotate(this);});
+        
+        $('.efl').on('click', self.RotateRight);
+        $('.efr').on('click', self.RotateLeft);
+        
+        self.ElementListener( null );
         
     };
+    // </editor-fold>
     
+    // <editor-fold defaultstate="collapsed" desc="RotateLeft">
+    this.RotateLeft  = function(){
+        
+        if( ! self.ActiveElement ) return false;
+        
+        var a = parseInt($('#angle').val());
+        a=a+10;
+        $('#angle').val(a).trigger('change');
+    };
+    // </editor-fold>
     
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // <editor-fold defaultstate="collapsed" desc="RotateRight">
+    this.RotateRight = function(){
+        
+        if( ! self.ActiveElement ) return false;
+        
+        var a = parseInt($('#angle').val());
+        a=a-10;
+        $('#angle').val(a).trigger('change');
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Rotate">
+    this.Rotate = function(e){
+        
+        var a = parseInt( $(e).val() );
+        if(a < 0 ) $(e).val(0);
+        if(a > 359) $(e).val(0);
+        
+        a = parseInt( $(e).val() )
+        
+        if(! self.ActiveElement ) return false;
+        
+        var t = a+'deg';
+        
+        self.ActiveElement.css({
+            '-o-transform': 'rotate('+t+')',
+            '-moz-transform': 'rotate('+t+')',
+            '-ms-transform': 'rotate('+t+')',
+            '-webkit-transform': 'rotate('+t+')',
+            '-khtml-transform': 'rotate('+t+')',
+            'transform': 'rotate('+t+')',
+        });
+        self.ActiveElement.data('angle',a);
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Expand">
+    this.Expand = function(){
+        
+        if(self.ActiveElement){
+            
+            var w = self.etc.width();
+            self.ActiveElement.width(w);
+            self.ActiveElement.css('left',0);
+            self.HistoryPushState();
+            
+        }
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Grid">
+    this.Grid = function(){
+        
+        var w = self.etc.width();
+        var h = self.etc.height();
+        
+        if(self.grid == null){
+            
+            self.etc.find('.grid').remove();
+            
+            for(var x = 0; x < w; x=x+self.gridStep){
+                self.etc.append('<div class="grid" style="left:'+x+'px;"></div>');
+            }
+            for(var y = 0; y < h; y=y+self.gridStep){
+                self.etc.append('<div class="grid vertical" style="top:'+y+'px;"></div>');
+            }
+            self.grid = true;
+            self.controls.grid.addClass('active');
+        } else {
+            
+            self.gridIndx++;
+            switch (self.gridIndx){
+                
+                case 1:
+                    self.etc.find('.grid').addClass('white');
+                break;
+                case 2:
+                    self.etc.find('.grid').addClass('yellow').removeClass('white');
+                break;
+                case 3:
+                    self.etc.find('.grid').addClass('green').removeClass('yellow');
+                break;
+                case 4:
+                    self.etc.find('.grid').addClass('red').removeClass('green');
+                break;
+                case 5:
+                    self.etc.find('.grid').addClass('blue').removeClass('red');
+                break;
+                case 6:
+                    self.etc.find('.grid').addClass('gray').removeClass('blue');
+                break;
+                case 7:
+                    self.gridIndx = 0;
+                    self.grid = null;
+                    self.etc.find('.grid').remove();
+                    self.controls.grid.removeClass('active');
+                break;
+                
+            }
+            
+        }
+        
+        
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Resolution">
+    this.Resolution = function(){
+        
+        var select = self.etc.closest('.editor-wrap').find('.resolution select');
+        $.each(self.resolutions, function(i,e){
+            select.append('<option value="'+i+'">'+i+'</option>');
+        });
+        select.on('change', function(){
+            var t = ($(this).find('option:selected').val());
+            var resolution = self.resolutions[t];
+            $('#width').val(resolution.width).trigger('change');
+            $('.btn-wrap').css('width',resolution.width+'px');
+            self.currentResolution = t;
+            self.resolutions[self.currentResolution].hisindx--;
+            self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
+            
+            self.Refresh();
+            self.HistoryPushState();
+            self.FixVisibility();
+        });
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Magic">
+    this.Magic = function(){
+        
+        //TODO resiti nedostajuce elemente na drugim rezolucijama
+        
+        var list = {};
+        
+        $.each(self.resolutions, function(i,e){
+            
+            var indx = e.hisindx;
+            
+            var obj = e.history[indx];
+            
+            if( obj == undefined){
+                obj = e.history[indx-1];
+            }
+            
+            if(obj !== undefined){
+                if(self.ObjectSize(obj)){
+                    console.log(obj);
+                    obj.find('.group-element').each(function(a,s){
+                        var $s = $(s);
+                        var id = $s.attr('id');
+                        list[id] = $s;
+                    });
+                }
+            }
+            
+        });
+        
+        $.each(list, function(i,e){
+            
+            var exist = self.etc.find('#'+i);
+            if( ! exist.length ){
+                var c = e.clone();
+                self.AddElement(c);
+            }
+            
+        });
+        
+        setTimeout(function(){
+            self.FixVisibility();
+        },150);
+
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="FixVisibility">
+    this.FixVisibility = function(){
+        
+        var w = self.etc.width();
+        
+        self.etc.find('.group-element').each(function(i,e){
+            
+            var $e = $(e);
+            
+            var left = parseInt( $e.css('left') );
+            
+            if(left > w){
+                $e.css({
+                    left: w/2 - $e.width()/2
+                });
+            }
+            
+        });
+        
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Pin">
     this.Pin = function(){
         $('body').find('.pin').on('click', function(){
             var p = $(this);
@@ -157,19 +432,19 @@ var EditorClass = function(){
             
         });
     };
-    
-    
-    this.HistoryPushState = function(){
-        var code = self.etc.clone(true,true);
-        self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx] = code;
-        self.resolutions[self.currentResolution].hisindx++;
-    }; 
-    
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ObjectSize">
+    this.ObjectSize = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="SizeHandler">
     this.SizeHandler = function(){
         
         $('#width').val( self.etc.outerWidth() );
@@ -177,6 +452,14 @@ var EditorClass = function(){
         
         var checkHeightTimer = function(){
             if( ! $('#height').is(':focus') ){ $('#height').val( self.etc.outerHeight() ); }
+            
+            if(self.ActiveElement){
+                $('#width,#height').attr('disabled','disabled');
+                $('#ewidth,#eheight,#zindex').removeAttr('disabled','disabled');
+            } else {
+                $('#width,#height').removeAttr('disabled','disabled');
+                $('#ewidth,#eheight,#zindex').attr('disabled','disabled');
+            }
         };
         
         setInterval(checkHeightTimer, 100);
@@ -189,7 +472,7 @@ var EditorClass = function(){
             },120,w);
             
         });
-        $('#height').on('change', function(){ self.etc.height( $(this).val() ); });
+        $('#height').on('change', function(){ self.etc.height( $(this).val() ); self.gridIndx = 0; self.grid = null; self.Grid(); });
         $('#zindex').on('change', function(){ var a = self.etc.find('.group-element.active'); if(a.length){ a.css('z-index', $(this).val() ); }});
         
         $('#ewidth').on('change', function(){
@@ -214,25 +497,65 @@ var EditorClass = function(){
             }
         });
     };
-    
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
-    this.Events = function(){
-        self.controls.pointer.on( 'click', self.Pointer );
-        self.controls.text.on   ( 'click', self.EditText );
-        self.controls.image.on  ( 'click', self.EditImage );
-        self.controls.link.on   ( 'click', self.EditLink );
-        self.controls.delete.on ( 'click', self.Remove );
-        self.controls.background.on ( 'click', self.Background );
-        self.controls.video.on ( 'click', self.EditVideo );
-        self.controls.undo.on ( 'click', self.Undo );
-        self.controls.redo.on ( 'click', self.Redo );
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="HistoryPushState">
+    this.HistoryPushState = function(){
+        var code = self.etc.clone(true,true);
+        
+        if(code !== self.lastSelection){
+            self.lastSelection = code;
+            self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx] = code;
+            self.resolutions[self.currentResolution].hisindx++;
+            self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
+        }
+        
+        self.ControlUndoRedoButtons();
+        
+        var size = ( self.ObjectSize(self.resolutions[self.currentResolution].history) );
+        if(self.selectionLimit < size){
+            console.log('Limit Excesed: ' + size);
+        }
+        
+    }; 
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ControlUndoRedoButtons">
+    this.ControlUndoRedoButtons = function(){
+        
+        var currIndx = self.resolutions[self.currentResolution].hisindx;
+        
+        if(currIndx > 0){
+            $('#ec-undo').removeClass('disabled');
+        } else {
+            $('#ec-undo').addClass('disabled');
+        }
+        
+        if(currIndx < self.lastHistoryIndx-1){
+            $('#ec-redo').removeClass('disabled');
+        } else {
+            $('#ec-redo').addClass('disabled');
+        }
     };
-    
-    
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Refresh">
+    this.Refresh = function(){
+        var code = self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx];
+        if(code){
+            if( code.length){
+                $('body').find('.editor').replaceWith( code );
+                self.etc = $('body').find('.editor');
+                self.etc.find('.group-element').each(function(i,e){
+                    self.ElementBind( $(e) );
+                });
+            }
+        }
+        self.ControlUndoRedoButtons();
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Undo">
     this.Undo = function(){
         
         var code = self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx - 1];
@@ -246,17 +569,31 @@ var EditorClass = function(){
                 });
             }
         }
+        self.ControlUndoRedoButtons();
        // self.etc.replaceWith(code);
         
     };
-    
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Redo">
     this.Redo = function(){
         
-        
-        
+        var code = self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx + 1];
+        if(code){
+            if( code.length){
+                self.resolutions[self.currentResolution].hisindx++;
+                $('body').find('.editor').replaceWith( code );
+                self.etc = $('body').find('.editor');
+                self.etc.find('.group-element').each(function(i,e){
+                    self.ElementBind( $(e) );
+                });
+            }
+        }
+        self.ControlUndoRedoButtons();
     };
-    
-    
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ElementBind">
     this.ElementBind = function( $e ){
         
         var c = $e.clone(false,false);
@@ -270,18 +607,29 @@ var EditorClass = function(){
         }
         $e.draggable({
             stop: self.HistoryPushState,
-            disabled:false
+            disabled:false,
+             start: function (event, ui) {
+                var left = parseInt($(this).css('left'),10);
+                left = isNaN(left) ? 0 : left;
+                var top = parseInt($(this).css('top'),10);
+                top = isNaN(top) ? 0 : top;
+                recoupLeft = left - ui.position.left;
+                recoupTop = top - ui.position.top;
+            },
+            drag: function (event, ui) {
+                ui.position.left += recoupLeft;
+                ui.position.top += recoupTop;
+            }
         });
 
-        $e.on('click', function(event){
-            self.ElementListener( this );
-        });
-        
         $e.on('click', function( event){
             
             self.etc.find('.group-element').removeClass('active');
             
             $e.addClass('active');
+            self.ActiveElement = $e;
+            
+            self.ElementListener( this );
             
             $('#zindex').val( $(this).css('z-index') );
             $('#ewidth').val( $(this).width() );
@@ -291,25 +639,21 @@ var EditorClass = function(){
         
         
     };
-    
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
-    this.Remove = function(){ self.etc.find('.group-element.active').remove(); self.HistoryPushState(); };
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
-    this.Pointer = function(){ self.etc.find('.group-element.active').removeClass('active'); };
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
-    this.Background = function(){
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Remove">
+    this.Remove = function(){ self.etc.find('.group-element.active').remove(); self.HistoryPushState(); self.ActiveElement = null; };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="Pointer">
+    this.Pointer = function(){ 
+        self.etc.find('.group-element.active').removeClass('active'); self.ActiveElement = null; 
+        self.ElementListener(null);
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditBackground">
+    this.EditBackground = function(){
         
         var a = self.etc.find('.group-element.active');
         
@@ -324,39 +668,94 @@ var EditorClass = function(){
                         'background-image': 'url('+src+')',
                         'background-repeat': 'no-repeat',
                         'background-size': 'cover',
+                        'background-position':'center center',
                         height: img.height(),
                         width: img.width()
                     });
-                    
-                    img.remove();
-                    a.data('action','Edit.Background');
+                    a.html('');
+                    a.data('action','Editor.EditBackground');
                     self.HistoryPushState();
                 }
             } 
+            else if( a.data('action') == 'Editor.EditBackground'){
+                
+                var src = a.css('background-image');
+                src = (src.substring(5, src.length-2));
+ 
+                a.css('background-image','');
+                
+                var Element = new Image();
+                    Element.src = src;
+                    Element.className += "editable-img";
+                    
+                a.append(Element);
+                a.data('action','Editor.EditImage');
+                self.HistoryPushState();
+            } 
+            
         }
     };
+    // </editor-fold>
     
-    /**
-     * 
-     * @returns {String}
-     */
+    // <editor-fold defaultstate="collapsed" desc="BackgroundSize">
+    this.BackgroundSize = function(e){
+        
+        var $e = self.etc.find('.group-element.active');
+        
+        if( ! $e.length ) return false;
+        
+        if( $e.data('action') !== 'Editor.EditBackground') return false; 
+        
+        var s = $(e);
+        
+        var opt = s.find('option:selected');
+        console.log(opt.val());
+        switch (opt.text()){
+            case 'Cover':
+            case 'Contain':
+                $e.css('background-size', opt.val());
+            break;
+            case 'Wide':
+                console.log('100');
+                $e.css('background-size', '100%');
+            break;
+            case 'custom':
+            
+            break;
+        }
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="BackgroundPosition">
+    this.BackgroundPosition = function(e){
+      
+        var $e = self.etc.find('.group-element.active');
+        
+        if( ! $e.length ) return false;
+        
+        if( $e.data('action') !== 'Editor.EditBackground') return false; 
+        
+        var s = $(e);
+        
+        var opt = s.find('option:selected');
+        $e.css('background-position', opt.val());
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="UUID">
     this.UUID = function() {
         var s4 = function() { return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1); };
         return 'uuid_' + s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
     };
+    // </editor-fold>
 
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // <editor-fold defaultstate="collapsed" desc="CancelPopWindow">
     this.CancelPopWindow = function(e){ $(e).closest('.pop-window').remove(); };
-    
-    /**
-     * 
-     * @param {type} input
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="previewImage">
     this.previewImage = function(input){
       
         var reader = new FileReader();
@@ -368,53 +767,139 @@ var EditorClass = function(){
 
         reader.readAsDataURL(input.files[0]);
     };
-    
-    
-    /**
-     * 
-     * @param {type} str
-     * @returns {Boolean}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ValidateLink">
     this.ValidateLink = function( str ){
         var re = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?/;
         return re.test( str );
     };
-    
-    /**
-     * 
-     * @param {type} str
-     * @returns {Boolean}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ValidateEmpty">
     this.ValidateEmpty = function( str ){ return str.trim() !== '' ? true : false; };
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="removeActiveControl">
     this.removeActiveControl = function(){
         $.each(self.controls, function(i,e){
             if( ! $(e).hasClass('ignore') )
                 $(e).removeClass('active');
         });
     };
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="ElementListener">
     this.ElementListener = function(e){
       
         var $e = $(e);
         
+        if(! $e.length ){
+            e = null;
+            $('#angle').val(0);
+        } else {
+            var angle = $e.data('angle');
+            if(angle !== undefined){
+                $('#angle').val(angle);
+            } else {
+                $('#angle').val(0);
+            }
+        }
+        
         self.clickedElement = $e;
         self.removeActiveControl();
         
-        if( $e.is('a') ){
-            self.controls.link.addClass('active');
+        self.controls.background.addClass('disabled').removeClass('active');
+        self.controls.delete.addClass('disabled').removeClass('active');
+        self.controls.image.addClass('disabled').removeClass('active');
+        self.controls.magic.addClass('disabled').removeClass('active');
+        self.controls.link.addClass('disabled').removeClass('active');
+        self.controls.video.addClass('disabled').removeClass('active');
+        self.controls.text.addClass('disabled').removeClass('active');
+        self.controls.expand.addClass('disabled').removeClass('active');
+        
+        $('#angle').attr('disabled','disabled');
+        $('#ef-bg').addClass('hidden');
+        
+        if( $e.is('a') || $e.has('a').length){
+            setTimeout(function(){
+                self.controls.link.addClass('active').removeClass('disabled');
+                self.controls.text.addClass('active').removeClass('disabled');
+                self.controls.expand.removeClass('disabled');
+                self.controls.delete.removeClass('disabled');
+            },100);
         }
-    };
+        
+        if($e.data('action') === 'Editor.EditBackground'){
+            setTimeout(function(){
+                self.controls.background.addClass('active').removeClass('disabled');
+                self.controls.delete.removeClass('disabled');
+                self.controls.link.addClass('disabled').removeClass('active');
+                self.controls.text.addClass('disabled').removeClass('active');
+                self.controls.expand.removeClass('disabled');
+                $('#ef-bg').removeClass('hidden');
+                $('#ef-bg-pos').removeClass('hidden');
+                
+            },100);
+        } 
+        
+        if($e.data('action') == 'Editor.EditImage'){
+            setTimeout(function(){
+                self.controls.background.addClass('active').removeClass('disabled');
+                self.controls.link.removeClass('disabled');
+                self.controls.delete.removeClass('disabled');
+                self.controls.text.addClass('disabled').removeClass('active');
+                self.controls.expand.removeClass('disabled');
+                $('#angle').removeAttr('disabled');
+            },100);
+        } 
+        
+        if($e.data('action') == 'Editor.EditVideo'){
+            setTimeout(function(){
+                self.controls.video.addClass('active').removeClass('disabled');
+                self.controls.delete.removeClass('disabled');
+                self.controls.text.addClass('disabled').removeClass('active');
+                self.controls.link.addClass('disabled').removeClass('active');
+                self.controls.expand.removeClass('disabled');
+                $('#angle').removeAttr('disabled');
+            },100);
+        } 
+        
+        if($e.data('action') == 'Editor.EditText'){
 
+            setTimeout(function(){
+                self.controls.text.addClass('active').removeClass('disabled');
+                self.controls.delete.removeClass('disabled');
+                self.controls.link.removeClass('disabled');
+                self.controls.link.removeClass('active');
+                self.controls.expand.removeClass('disabled');
+                $('#angle').removeAttr('disabled');
+                if($e.has('a').length){
+                    self.controls.link.addClass('active');
+                }
+                
+            },100);
+        } 
+        
+        if( e === null ){
+            setTimeout(function(){
+                self.controls.background.addClass('disabled').removeClass('active');
+                self.controls.delete.addClass('disabled').removeClass('active');
+                self.controls.image.removeClass('disabled').removeClass('active');
+                self.controls.magic.removeClass('disabled').removeClass('active');
+                self.controls.link.removeClass('disabled').removeClass('active');
+                self.controls.video.removeClass('disabled').removeClass('active');
+                self.controls.text.removeClass('disabled').removeClass('active');
+            },100);
+            
+        } else {
+            console.log($e.data('action'));
+        }
+        
+    };
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditText">
     this.EditText = function( e ){
         var html = self.CloneTemplate('text');
         var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
@@ -433,6 +918,9 @@ var EditorClass = function(){
         tinymce.init({
                 selector: "#" + id,
                 height: 500,
+                force_br_newlines : true,
+                force_p_newlines : false,
+                forced_root_block : '',
                 plugins: [
                   "advlist autolink autosave link image lists charmap print preview hr anchor pagebreak spellchecker",
                   "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
@@ -491,33 +979,25 @@ var EditorClass = function(){
         });
         
     };
-    
-    
-    /**
-     * 
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditImage">
     this.EditImage = function(){
         var html = self.CloneTemplate('image');
         var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
     };
+    // </editor-fold>   
     
-    
-    
+    // <editor-fold defaultstate="collapsed" desc="EditVideo">
     this.EditVideo = function(){
         
         var html = self.CloneTemplate('video');
         var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
         
     };
-    
-    
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditLink">
     this.EditLink = function( e ){
         
         var element = self.etc.find('.group-element.active');
@@ -538,12 +1018,9 @@ var EditorClass = function(){
             $html.find('input[name=url]').val(src);
         }
     };
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="EditGroup">
     this.EditGroup = function( e ){ $(this).toggleClass('active'); };
     
     /**
@@ -585,12 +1062,9 @@ var EditorClass = function(){
             self.CancelPopWindow(e);
         }
     };
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="SubmitText">
     this.SubmitText = function( e ){
         tinyMCE.triggerSave();
         var t = $(e).closest('.pop-window').find('textarea[name=text]');
@@ -607,8 +1081,9 @@ var EditorClass = function(){
         }
         self.CancelPopWindow(e);
     };
+    // </editor-fold>
     
-    
+    // <editor-fold defaultstate="collapsed" desc="SubmitVideo">
     this.SubmitVideo = function( e ){
         
         var url = $(e).closest('.pop-window').find('input[name=url]').val();
@@ -637,13 +1112,9 @@ var EditorClass = function(){
         self.CancelPopWindow(e);
         
     };
-    
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="PreviewImage">
     this.PreviewImage = function(e){
       
         var prv = $(e).parent().find('.img-prev');
@@ -660,13 +1131,9 @@ var EditorClass = function(){
             };
             Element.src = src;
     };
-    
-    
-    /**
-     * 
-     * @param {type} e
-     * @returns {undefined}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="SubmitImage">
     this.SubmitImage = function(e){
         
          var url = $(e).closest('.pop-window').find('input[name=url]').val();
@@ -682,14 +1149,9 @@ var EditorClass = function(){
              
         self.CancelPopWindow(e);
     };
-    
-    
-    /**
-     * 
-     * @param {type} element
-     * @param {type} s
-     * @returns {window.$|$}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="AddElement">
     this.AddElement = function( element, s){
       
         var $e = $(element);
@@ -712,13 +1174,9 @@ var EditorClass = function(){
         
         return $(element);
     };
-    
-    
-    /**
-     * 
-     * @param {type} target
-     * @returns {EditorClass.CloneTemplate.html}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="CloneTemplate">
     this.CloneTemplate = function(target){
         
         var t = '.template-' + target;
@@ -738,15 +1196,9 @@ var EditorClass = function(){
 
         return html;
     };
-    
-    /**
-     * 
-     * @param {type} title
-     * @param {type} content
-     * @param {type} size
-     * @param {type} buttons
-     * @returns {EditorClass.PopWindow.$html|window.$|$}
-     */
+    // </editor-fold>
+
+    // <editor-fold defaultstate="collapsed" desc="PopWindow">
     this.PopWindow = function(title, content, size, buttons){
         
         var html = '<div class="pop-window '+size+'"><div class="pop-title noselect">'+title+'</div><div class="pop-content">'+content.html()+'</div><div class="pop-buttons">'+buttons.html()+'</div></div>';
@@ -767,7 +1219,7 @@ var EditorClass = function(){
         
         return $html;
     };
-    
+    // </editor-fold>
     
     
     

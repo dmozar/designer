@@ -11,5 +11,7 @@ return [
     
     
 
-    'NewProject'                => 'New Project'
+    'NewProject'                => 'New Project',
+    'SaveProject'               => 'Save Project',
+    'GenerateCode'              => 'Generate Code'
 ];

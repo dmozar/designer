@@ -11,5 +11,7 @@ return [
     
     
 
-    'NewProject'                => 'Novi projekat'
+    'NewProject'                => 'Novi projekat',
+    'SaveProject'               => 'Snimi project',
+    'GenerateCode'              => 'Generiši kod'
 ];

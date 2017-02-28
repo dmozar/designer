@@ -9,18 +9,32 @@
     <link rel="icon" href="/favicon.ico">
 
     <title>Title</title>
-    <link href="https://fonts.googleapis.com/css?family=Poiret+One|Roboto" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700,300&amp;subset=latin,latin-ext,cyrillic" rel="stylesheet">
     <?= Minty\Assets\AssetsController::CSS() ?>
   </head>
 
   <body>
       
       <header>
-          
+          <a href="<?=site_url()?>" class="logo"><img src="<?=assets_url('assets/img/layout/logo.jpg')?>" /></a>
           <?php echo $this->getServiceLocator()->get('NavigationHelper')->html() ?>
       </header>
 
       <?php echo $ViewModel->html(); ?>
+      
+      <footer>
+          <div class="footer-wrap clear">
+              <?php if(0>1):?>
+              <a href="<?=site_url()?>" class="logo"><img src="<?=assets_url('assets/img/layout/logo-black.png')?>" /></a>
+              <?php endif;?> 
+              <div class="footer-links">
+                  <a href="">Tutorial</a>
+                  <a href="">Support</a>
+                  <a href="">Terms of use</a>
+                  <a href="">Contact us</a>
+              </div>
+          </div>
+      </footer>
       
       <?php echo Minty\Application::$Profiler; ?>
       
