@@ -85,7 +85,7 @@ class UserService implements ServiceInterface {
      * @return Minty\Mysql\ORM\Paginator
      */
     public function getUser(){
-        $Repository = $em = DoctrineManager::get()->EntityManager()->getRepository('Imedia\User\Entity\User');
+        $Repository = DoctrineManager::get()->EntityManager()->getRepository('Imedia\User\Entity\User');
         return $Repository->getUser(/* options */);
     }
 
@@ -192,7 +192,7 @@ class UserService implements ServiceInterface {
      * @return boolean
      */
     public function login_user( $values ){
-        
+
         $user = new User;
         $user->setPassword( $values['password'] );
         $password = $user->getPassword();

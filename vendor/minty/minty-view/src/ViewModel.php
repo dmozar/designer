@@ -68,6 +68,7 @@ class ViewModel  {
             
             $this->{$key} = $value;
         }
+        return $this;
     }
 
     /**

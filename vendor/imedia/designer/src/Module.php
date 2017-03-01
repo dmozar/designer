@@ -1,4 +1,4 @@
-<?php namespace Imedia\Shop;
+<?php namespace Imedia\Designer;
 
 use Application\Module as ApplicationModule;
 

@@ -1,5 +1,5 @@
 <div class="editor-wrap">
-    <div class="editor-controlls pinstart pinparent pintop">
+    <div class="editor-controlls pinstart pinparent pintop" id="edd">
         <ul class="clear">
             <li id="ec-undo" class="ignore disabled"><i class="fa fa-undo" aria-hidden="true"></i></li>
             <li id="ec-redo" class="ignore disabled"><i class="fa fa-repeat" aria-hidden="true"></i></li>
@@ -18,13 +18,14 @@
         <span class="pin"><i class="fa fa-thumb-tack" aria-hidden="true"></i></span>
     </div>
 
-    <div id="design-editor" class="editor noselect" spellcheck="false"></div>
+    <div id="design-editor" class="editor noselect" spellcheck="false" data-id="<?=$this->id?>" data-url="<?=Minty\Router::FromRoute('Imedia\Designer', 'load')?>"></div>
 
 
     
-    
+    <!-- Templates -->
     <div class="templates">
         
+        <!-- Template Text -->
         <div class="template-text" data-title="Add/Edit Text" data-size="medium">
             <div class="form-group">
                 <label>Text</label>
@@ -34,9 +35,10 @@
                 <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
                 <button type="button" name="button-action" onclick="Editor.SubmitText(this);">OK</button>
             </div>
-        </div>
+        </div> 
+        <!-- Template Text end /-->
         
-        
+        <!-- Template Link -->
         <div class="template-link" data-title="Add/Edit Link" data-size="small">
             <div class="form-group">
                 <label>URL</label>
@@ -47,7 +49,9 @@
                 <button type="button" name="button-action" onclick="Editor.SubmitLink(this);">OK</button>
             </div>
         </div>
+        <!-- Template Link end /-->
         
+        <!-- Template Video -->
         <div class="template-video" data-title="Add/Edit Video" data-size="medium">
             <div class="form-group">
                 <label>Youtube URL</label>
@@ -62,25 +66,26 @@
                 <button type="button" name="button-action" onclick="Editor.SubmitVideo(this);">OK</button>
             </div>
         </div>
+        <!-- Template Video end /-->
         
+        <!-- Template Image -->
         <div class="template-image" data-title="Add/Edit Image" data-size="medium">
-            
             <div class="form-group">
                 <label>Image url</label>
                 <input type="url" name="url" value="" placeholder="Image link: http://site.com/image.jpg" maxlength="400" onchange="Editor.PreviewImage(this)"  />
                 <img class="img-prev" src="<?= assets_url('img/no-img.png')?>" data-src="<?= assets_url('img/no-img.png')?>" style="max-height:225px;max-width:300px;" />
             </div>
-            
             <div class="template-buttons">
                 <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
                 <button type="button" name="button-action" onclick="Editor.SubmitImage(this);">OK</button>
             </div>
-            
         </div>
+        <!-- Template Image end /-->
         
     </div>
+    <!-- Templates end /-->
     
-    <div class="editor-footer  pinparent pinbottom noselect">
+    <div class="editor-footer  pinparent pinbottom noselect" id="eff">
         <div class="ef-section pinstart">
             <span class="ef"><label>width:</label><input id="width" type="text" name="width" value="0" style="width:50px;" /></span>
             <span class="ef"><label>height:</label><input id="height" type="text" name="height" value="0" style="width:50px;" /></span>
@@ -95,6 +100,7 @@
                     <option value="cover">Cover</option>
                     <option value="contain">Contain</option>
                     <option value="wide">Wide</option>
+                    <option value="initial">Initial</option>
                 </select>
             </span>
             <span class="ef"><label>bg pos:</label><select name="bgpos" class="select" onchange="Editor.BackgroundPosition(this)">
@@ -114,7 +120,36 @@
 
 <div class="row btn-wrap">
     <div class="col-md-12">
-        <button id="btnsv" class="btn-btn btn-save-project pull-right" ><i class="fa fa-floppy-o" aria-hidden="true"></i> <?=language('SaveProject')?></button>
+        <div class="form-group clear">
+            <input type="text" name="title" value="" class="half pull-right form-control" placeholder="<?=language('titleplaceholder')?>" data-error="<?=language('TitleError')?>" />
+        </div>
+    </div>
+    <div class="col-md-12">
+        <?php if($this->id):?>
+        <button id="btnsn" data-url="<?= Minty\Router::FromRoute('Imedia\Designer', 'save')?>" class="btn-btn btn-save-project pull-right" ><i class="fa fa-floppy-o" aria-hidden="true"></i> <?=language('SaveProjectAsNew')?></button>
+        <?php endif;?> 
+        <button id="btnsv" data-url="<?= Minty\Router::FromRoute('Imedia\Designer', 'save')?>" class="btn-btn btn-save-project pull-right" ><i class="fa fa-floppy-o" aria-hidden="true"></i> <?=language('SaveProject')?></button>
         <button id="btngc" class="btn-btn btn-get-code pull-right" ><i class="fa fa-code" aria-hidden="true"></i> <?=language('GenerateCode')?></button>
     </div>
+</div>
+
+<!-- Modal -->
+<div id="Modal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="ModalTitle">Modal Header</h4>
+      </div>
+      <div class="modal-body">
+        <p id="ModalText">Some text in the modal.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
 </div>

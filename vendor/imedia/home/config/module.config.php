@@ -11,7 +11,7 @@ return [
                 
             ],
             'priority' => 1,
-            'controller' => 'Imedia\Shop\Controller\Controller',
+            'controller' => 'Imedia\Home\Controller\Controller',
             'method' => 'index',
             'action' => 'http'
         ]
@@ -20,7 +20,7 @@ return [
     
     
     'services' => [
-        'HomeService' => 'Imedia\Shop\Service\Service',
+        'HomeService' => 'Imedia\Home\Service\Service',
     ],
     
     
@@ -31,13 +31,13 @@ return [
     
     
     'view_helpers' => [
-        'HomeHelper' => 'Imedia\Shop\View\Helper'
+        'HomeHelper' => 'Imedia\Home\View\Helper'
     ],
     
     
     'assets' => [
         'css' => [
-            'home.css'      => __DIR__ . '/../public/css/home.css'
+            
         ],
         'js' => [
 

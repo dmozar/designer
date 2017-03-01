@@ -56,9 +56,10 @@ return $config = [
      * ----------------------------------------------
      */
     'modules' => [
-        'Imedia\Shop'               => PATH_ROOT . 'vendor/imedia/shop/src/',
+        'Imedia\Designer'           => PATH_ROOT . 'vendor/imedia/designer/src/',
         'Imedia\User'               => PATH_ROOT . 'vendor/imedia/user/src/',
         'Imedia\Proxy'              => PATH_ROOT . 'vendor/imedia/proxy/src/',
+        'Imedia\Home'               => PATH_ROOT . 'vendor/imedia/home/src/',
     ],
     
     

@@ -1,4 +1,4 @@
-<?php namespace Imedia\Shop\View;
+<?php namespace Imedia\Designer\View;
 
 use Minty\View\Interfaces\ViewInterface;
 use Minty\View\AbstractView;
@@ -34,12 +34,16 @@ class Helper extends AbstractView implements ViewInterface {
         
         $this->options = $options;
         
-        $Service = $this->getServiceLocator()->get('HomeService');
+        $Service = $this->getServiceLocator()->get('DesignerService');
+        
+        $RouteService   = $this->getServiceLocator()->Route;
+        $Route          = $RouteService->Route();
+        $params         = $Route->params_from_route();
         
         $ViewModel = $this->getView();
         
         $options = [
-            'editor' => $ViewModel->get('editor')->html()
+            'editor' => $ViewModel->setOptions(['id' => $params['id']])->get('editor')->html(),
         ];
         
         $ViewModel =  $this->getView( $options );

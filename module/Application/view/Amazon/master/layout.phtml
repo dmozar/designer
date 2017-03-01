@@ -27,11 +27,14 @@
               <?php if(0>1):?>
               <a href="<?=site_url()?>" class="logo"><img src="<?=assets_url('assets/img/layout/logo-black.png')?>" /></a>
               <?php endif;?> 
-              <div class="footer-links">
-                  <a href="">Tutorial</a>
-                  <a href="">Support</a>
-                  <a href="">Terms of use</a>
-                  <a href="">Contact us</a>
+              <div class="footer-links clear">
+                  <?php if(Minty\MVC::getUserData() ):?> 
+                  <a href="<?= site_url('logout')?>" class="pull-left">Sign Out</a> 
+                  <?php endif;?> 
+                  <a href="" class="pull-right">Contact us</a>
+                  <a href="" class="pull-right">Terms of use</a>
+                  <a href="" class="pull-right">Support</a>
+                  <a href="" class="pull-right">Tutorial</a>
               </div>
           </div>
       </footer>

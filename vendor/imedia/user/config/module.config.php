@@ -8,7 +8,8 @@ return [
         'login' => [
             'route' => '/{:login}',
             'constraints' => [
-                    'submit' => false
+                    'submit' => false,
+                    'status'=> null,
             ],
             'priority' => 1,
             'controller' => 'Imedia\User\Controller\UserController',
@@ -18,12 +19,31 @@ return [
                 'submit' => [
                     'route' => '/submit',
                     'constraints' => [
-                        'submit' => true
+                        'submit' => true,
+                        'status' => null,
                     ],
                     'priority'  => 1,
-                    'action' => 'ajax'
+                    'action' => 'http'
+                ],
+                'success' => [
+                    'route' => '/success',
+                    'constraints' => [
+                        'submit' => false,
+                        'status' => 'success'
+                    ],
+                    'priority'  => 1,
+                    'action' => 'http'
+                ],
+                'error' => [
+                    'route' => '/error',
+                    'constraints' => [
+                        'submit' => false,
+                        'status' => 'error'
+                    ],
+                    'priority'  => 1,
+                    'action' => 'http'
                 ]
-            ],
+            ]
         ],
         'logout' => [
             'route' => '/logout',
@@ -79,6 +99,8 @@ return [
     'views' => [
         'login'         => __DIR__ . '/../view/master/login.phtml',
         'registration'  => __DIR__ . '/../view/master/registration.phtml',
+        'error'         => __DIR__ . '/../view/master/error.phtml',
+        'success'       => __DIR__ . '/../view/master/success.phtml',
     ],
     'view_helpers' => [
         'LoginHelper'           => 'Imedia\User\View\LoginHelper',

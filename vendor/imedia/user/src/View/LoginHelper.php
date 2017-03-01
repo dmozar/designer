@@ -4,6 +4,7 @@ use Minty\View\Interfaces\ViewInterface;
 use Minty\View\AbstractView;
 use Minty\Output\OutputManager;
 use Minty\Session\SessionManager;
+use Minty\Router;
 
 /**
  * 
@@ -45,6 +46,23 @@ class LoginHelper extends AbstractView implements ViewInterface {
         
         $params = $Route->params_from_route();
 
+        $r = SessionManager::get()->Read('redirect');
+        
+        if( $params['status'] == "success" ){
+            $opt = [
+                'redirect' => $r ? $r : Router::FromRoute('Imedia\Home', 'index')
+            ];
+            $ViewModel =  $this->getView( $opt );
+            $ViewModel->get('success');
+            return $ViewModel;
+        }
+        
+        if( $params['status'] == "error" ){
+            $ViewModel =  $this->getView();
+            $ViewModel->get('error');
+            return $ViewModel;
+        }
+
         $options = [
             'form'          => $params,
             'submit'        => $params['submit'],
@@ -52,28 +70,24 @@ class LoginHelper extends AbstractView implements ViewInterface {
             'status'        => true,
             'error_filed'   => null,
             'error_value'   => null,
-            'callback'      => 'Login.Error'
         ];
+
+        if($params['submit'] == true){
+            $options['status'] = $Service->Login();
+            
+        }
+            
         
-         if($params['submit']){
-            $options['status']      = $Service->Login();
-            $options['message']     = $Service->GetMessage();
-            $options['error_filed'] = $Service->getErrorField(); 
-            $options['error_value'] = $Service->getErrorValue(); 
-            $options['callback']    = 'Login.Success';
+        if($options['status'] == 1 && $options['submit'] == true){
+            redirect(Router::FromChilde('Imedia\User', 'login', 'success'));
+        }
+        
+        if( $options['status'] != 1 && $options['submit'] == true){
+            redirect(Router::FromChilde('Imedia\User', 'login', 'error'));
         }
         
         $ViewModel =  $this->getView($options);
         $ViewModel->get('login');
-        
-        
-        
-        if( $options['submit'] )
-            if(! isset($post['callback']) )
-                OutputManager::get()->view( $ViewModel );
-            else {
-                OutputManager::get()->json( $options );
-            }
         
         return $ViewModel;
         

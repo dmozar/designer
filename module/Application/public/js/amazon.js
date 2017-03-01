@@ -1,5 +1,12 @@
-
-
+/**
+ * 01.03.2017
+ * @author Damir Mozzart
+ * @email dmozar@gmail.com
+ * 
+ *  Responsive Visual page generator javascript component
+ *    
+ * @returns {EditorClass}
+ */
 var EditorClass = function(){
 
     /**
@@ -11,14 +18,18 @@ var EditorClass = function(){
     /**
      * 
      */
+    this.projectId = null;
+    
+    /**
+     * 
+     */
     this.etc;
     
     /**
      * 
      */
     this.selection = null;
-    
-    
+
     /**
      * 
      */
@@ -48,34 +59,38 @@ var EditorClass = function(){
      * 
      */
     this.selectionText;
-    
-    
+
     /**
      * 
      */
     this.resolutions = {
         'desktop' : {
             'width' : 1120,
+            'height': 300,
             'history': {},
             'hisindx': 0
         },
         'tablet' : {
             'width' : 1024,
+            'height': 300,
             'history': [],
             'hisindx': 0
         },
         'mobile-hd' : {
             'width' : 768,
+            'height': 300,
             'history': [],
             'hisindx': 0
         },
         'mobile' : {
             'width' : 480,
+            'height': 300,
             'history': [],
             'hisindx': 0
         },
         'mobile-small' : {
             'width' : 340,
+            'height': 300,
             'history': [],
             'hisindx': 0
         }
@@ -105,7 +120,6 @@ var EditorClass = function(){
      * 
      */
     this.gridStep = 40;
-    
 
     /**
      * 
@@ -123,14 +137,15 @@ var EditorClass = function(){
         'magic'     : '#ec-magic',
         'expand'    : '#ec-expand',
         'grid'      : '#ec-grid',
-        'center'    : '#ec-center'
+        'center'    : '#ec-center',
+        'save'      : '#btnsv',
+        'saveasnew' : '#btnsn'
     };
     
     /**
      * 
      */
     this.clickedElement = null;
-    
 
     // <editor-fold defaultstate="collapsed" desc="__initialize">
     var __initialize = function(){
@@ -151,12 +166,8 @@ var EditorClass = function(){
         self.SizeHandler();
         self.Pin();
         self.Resolution();
+        self.LoadProject();
         
-        self.etc.resizable({
-            handles: 's'
-        });
-        
-       
     };
     // </editor-fold> 
 
@@ -176,6 +187,8 @@ var EditorClass = function(){
         self.controls.expand        = $(self.controls.expand);
         self.controls.grid          = $(self.controls.grid);
         self.controls.center        = $(self.controls.center);
+        self.controls.save          = $(self.controls.save);
+        self.controls.saveasnew     = $(self.controls.saveasnew);
     };
     // </editor-fold>
     
@@ -193,6 +206,9 @@ var EditorClass = function(){
         self.controls.magic.on ( 'click', self.Magic );
         self.controls.expand.on ( 'click', self.Expand );
         self.controls.grid.on ( 'click', self.Grid );
+        self.controls.center.on ( 'click', self.CenterObject );
+        self.controls.save.on ( 'click', self.SaveProject );
+        self.controls.saveasnew.on ( 'click', self.SaveProject );
         
         $('.editor-wrap, .btn-wrap').css('width',self.resolutions.desktop.width+'px');
         
@@ -208,6 +224,21 @@ var EditorClass = function(){
         $('.efr').on('click', self.RotateLeft);
         
         self.ElementListener( null );
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="CenterObject">
+    this.CenterObject = function(){
+        
+        if( self.ActiveElement == null ) return;
+        
+        var w = self.etc.width();
+        var l = w/2;
+        var x = self.ActiveElement.width() / 2;
+        var c = l - x;
+        self.ActiveElement.css('left',c+'px');
+        self.HistoryPushState();
         
     };
     // </editor-fold>
@@ -256,6 +287,7 @@ var EditorClass = function(){
             'transform': 'rotate('+t+')',
         });
         self.ActiveElement.data('angle',a);
+        self.HistoryPushState();
         
     };
     // </editor-fold>
@@ -345,11 +377,14 @@ var EditorClass = function(){
             $('.btn-wrap').css('width',resolution.width+'px');
             self.currentResolution = t;
             self.resolutions[self.currentResolution].hisindx--;
+            if(self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx < 0)
+                self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx = 0;
             self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
             
             self.Refresh();
             self.HistoryPushState();
             self.FixVisibility();
+            self.Pointer();
         });
     };
     // </editor-fold>
@@ -472,7 +507,16 @@ var EditorClass = function(){
             },120,w);
             
         });
-        $('#height').on('change', function(){ self.etc.height( $(this).val() ); self.gridIndx = 0; self.grid = null; self.Grid(); });
+        $('#height').on('change', function(){ 
+            var h = $(this).val();
+            self.etc.height( h ); 
+            self.gridIndx = 0; 
+            self.grid = null; if(self.grid){ self.Grid(); } 
+            self.resolutions[self.currentResolution]['height'] = h;
+            setTimeout(function(){
+                self.resolutions[self.currentResolution]['height'] = h;
+            },120,h);
+        });
         $('#zindex').on('change', function(){ var a = self.etc.find('.group-element.active'); if(a.length){ a.css('z-index', $(this).val() ); }});
         
         $('#ewidth').on('change', function(){
@@ -508,14 +552,13 @@ var EditorClass = function(){
             self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx] = code;
             self.resolutions[self.currentResolution].hisindx++;
             self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
+            
+            
         }
         
         self.ControlUndoRedoButtons();
         
         var size = ( self.ObjectSize(self.resolutions[self.currentResolution].history) );
-        if(self.selectionLimit < size){
-            console.log('Limit Excesed: ' + size);
-        }
         
     }; 
     // </editor-fold>
@@ -549,6 +592,8 @@ var EditorClass = function(){
                 self.etc.find('.group-element').each(function(i,e){
                     self.ElementBind( $(e) );
                 });
+                self.etc.width( self.resolutions[self.currentResolution].width );
+                self.etc.height( self.resolutions[self.currentResolution].height );
             }
         }
         self.ControlUndoRedoButtons();
@@ -665,15 +710,19 @@ var EditorClass = function(){
                     var src = img.attr('src');
                     
                     a.css({
-                        'background-image': 'url('+src+')',
-                        'background-repeat': 'no-repeat',
-                        'background-size': 'cover',
-                        'background-position':'center center',
-                        height: img.height(),
-                        width: img.width()
+                        'background-image':     'url('+src+')',
+                        'background-repeat':    'no-repeat',
+                        'background-size':      'cover',
+                        'background-position':  'center center',
+                        height:                 img.height(),
+                        width:                  img.width()
                     });
                     a.html('');
                     a.data('action','Editor.EditBackground');
+                    a.attr('data-action','Editor.EditBackground');
+                    self.HistoryPushState();
+                } else {
+                    a.attr('data-action','Editor.EditBackground');
                     self.HistoryPushState();
                 }
             } 
@@ -690,6 +739,7 @@ var EditorClass = function(){
                     
                 a.append(Element);
                 a.data('action','Editor.EditImage');
+                a.attr('data-action','Editor.EditImage');
                 self.HistoryPushState();
             } 
             
@@ -703,20 +753,18 @@ var EditorClass = function(){
         var $e = self.etc.find('.group-element.active');
         
         if( ! $e.length ) return false;
-        
         if( $e.data('action') !== 'Editor.EditBackground') return false; 
         
         var s = $(e);
-        
         var opt = s.find('option:selected');
-        console.log(opt.val());
+
         switch (opt.text()){
             case 'Cover':
             case 'Contain':
+            case 'Initial':
                 $e.css('background-size', opt.val());
             break;
             case 'Wide':
-                console.log('100');
                 $e.css('background-size', '100%');
             break;
             case 'custom':
@@ -817,6 +865,11 @@ var EditorClass = function(){
         self.controls.video.addClass('disabled').removeClass('active');
         self.controls.text.addClass('disabled').removeClass('active');
         self.controls.expand.addClass('disabled').removeClass('active');
+        self.controls.center.addClass('disabled').removeClass('active');
+        
+        if(self.ActiveElement !== null){
+            self.controls.center.removeClass('disabled');
+        }
         
         $('#angle').attr('disabled','disabled');
         $('#ef-bg').addClass('hidden');
@@ -1221,11 +1274,221 @@ var EditorClass = function(){
     };
     // </editor-fold>
     
+    // <editor-fold defaultstate="collapsed" desc="SaveProject">
+    this.SaveProject = function(){
+        
+        if( $(this).attr('id') == 'btnsn'){
+            self.projectId = null;
+        }
+      
+        var btn = $(this),
+            saved = {},
+            indx,
+            obj,
+            jsonString,
+            $t,
+            _title,
+            loader = $('<div class="loader"></div>');
     
+        self.etc.find('.grid').remove();
+        self.grid = null;
+        self.gridIndx = 0;
+
+        $.each(self.resolutions, function(i,e){
+            saved[i] = {
+                'width' : 0,
+                'height': 0,
+                'json' : null,
+            };
+            
+            indx = e.hisindx;
+            if(indx < 0) indx = 0;
+            obj = e.history[indx];
+            
+            if(obj == undefined){ obj = e.history[indx-1];}
+            
+            if(obj !== undefined){
+                obj.find('.grid').remove();
+                obj.find('.active').removeClass('active');
+                saved[i].width = e.width;
+                saved[i].height = e.height;
+                saved[i].json = obj[0].outerHTML;
+            }
+        });
+        
+        jsonString = JSON.stringify(saved);
+        $t = $('body').find('input[name=title]');
+        _title = $t.val();
+        
+        if(_title.trim() == ""){
+                $('#ModalTitle').html('Warning');
+                $('#ModalText').html( $t.data('error') );
+                $('#Modal').modal('show');
+                $t.addClass('error');
+                return false;
+        } else {
+            $t.removeClass('error');
+        }
+        
+        
+        
+        self.etc.append(loader);
+        $('#edd').append('<div class="mask-controls" />');
+        $('#eff').append('<div class="mask-controls" />');
+        
+        btn.addClass('disabled').prop('disabled','disabled');
+
+        $.post(btn.data('url'), { json:jsonString, id:self.projectId, title:_title }, function(response){
+
+               loader.remove();
+               $('#edd').find('.mask-controls').remove();
+               $('#eff').find('.mask-controls').remove();
+
+               if(response.status == true){
+                   self.projectId = response.id;
+               }
+
+               btn.removeClass('disabled').removeAttr('disabled');
+
+               $('#ModalTitle').html(response.title);
+               $('#ModalText').html(response.message);
+               $('#Modal').modal('show');
+
+       });
+    };
+    // </editor-fold>
     
+    // <editor-fold defaultstate="collapsed" desc="LoadProject">
+    this.LoadProject = function(){
+        
+        var id =  self.etc.data('id');
+        var url = self.etc.data('url');
+        
+        var loader = $('<div class="loader"></div>');
+        self.etc.append(loader);
+        
+        if(! id || ! url ) { loader.remove(); return false; }
+        
+        $('#edd').append('<div class="mask-controls" />');
+        $('#eff').append('<div class="mask-controls" />');
+        
+        $.post( url, {'id':id}, function(response){
+            
+            
+            
+            if( response.status == false ){
+                
+                $('#ModalTitle').html(response.title);
+                $('#ModalText').html(response.message);
+                $('#Modal').modal('show');
+                loader.remove();
+                
+                $('#edd').find('.mask-controls').remove();
+                $('#eff').find('.mask-controls').remove();
+                
+                return false;
+            }
+            
+            $('body').find('input[name=title]').val(response.title);
+            
+            self.projectId  = response.id;
+            
+            self.ParseJson( response.json );
+            
+        });
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="ParseJson">
+    this.ParseJson = function(json){
+      
+        obj = JSON.parse( json );
+        
+        $.each(obj, function(i,e){
+            if(e.width > 0 && e.height > 0){
+                
+                self.resolutions[i]['history'][0]   = $(e.json);
+                self.resolutions[i].width           = e.width;
+                self.resolutions[i].height          = e.height;
+                
+                if(i == 'desktop'){
+                    self.etc.width(e.width);
+                    self.etc.height(e.height);
+                    $('.editor-wrap').width(e.width);
+                }
+            }
+        });
+        
+        setTimeout(function(){
+            self.Refresh();
+            setTimeout(function(){
+                self.etc.find('.loader').remove();
+                $('#edd').find('.mask-controls').remove();
+                $('#eff').find('.mask-controls').remove();
+            },2000);
+            
+        },1000);
+        
+    };
+    // </editor-fold>
+
 $(function(){ __initialize(); });};
 
+
+/**
+ * 01.03.2017
+ * @author Damir Mozzart
+ * @email dmozar@gmail.com
+ * 
+ *  Responsive Visual page generator javascript component
+ *
+ * @returns {RedirectClass}
+ */
+var RedirectClass = function(){
+    
+    var self = this;
+
+    // <editor-fold defaultstate="collapsed" desc="__init">
+    var __init = function(){
+        if( $('.redirect').length ){
+            var r = $('.redirect');
+            if(r.data('redtype') == 'countdown'){
+                var url = r.data('redirect');
+                self.countdown(url);
+            }
+        }
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="countdown">
+    this.countdown = function(url){
+        
+        var countdownElement,
+        seconds = 10,
+        second = 0,
+        interval = null;
+        
+        countdownElement = document.getElementById('countdown');
+        
+        interval = setInterval(function() {
+            countdownElement.innerHTML = (seconds - second);
+            if (second >= seconds) {
+                window.location.href = url;
+                clearInterval(interval);
+            }
+            second++;
+        }, 1000);
+        
+    };
+    // </editor-fold>
+
+$(function(){ __init(); });};
+
+
 var Editor = new EditorClass();
+var Redirect = new RedirectClass();
 
 
 
