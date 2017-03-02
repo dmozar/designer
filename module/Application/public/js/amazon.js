@@ -250,10 +250,13 @@ var EditorClass = function(){
                         var strHtml = obj.html();
                         if( ! strHtml ) {
                             strHtml = obj[0].innerHTML;
+                            if( ! strHtml ){
+                                strHtml = g;
+                            }
                         }
                         if(strHtml){
                             items[id] = {
-                                html : obj.html(),
+                                html : strHtml,
                                 properties: {}
                             };
                         }
