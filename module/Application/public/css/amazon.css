@@ -742,7 +742,7 @@ input:disabled {
     right:0px;
     bottom: 0px;
     z-index: 99999;
-    background: #fff url('../img/layout/loader.gif') center center no-repeat;
+    background: rgba(255, 255, 255, 0.96) url(../img/layout/loader.gif) center center no-repeat;
     background-position-x: center;
     background-position-y: 50px;
 }
