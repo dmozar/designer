@@ -56,6 +56,15 @@ return [
     'UncategorizedError'        => 'There is an uncategorized error processing your request. Please contact our support.',
     'DesignSaved'               => 'Project is saved successfully.',
     'TitleError'                => 'Project title is required and can not be a empty. Please add your project name.',
-    'titleplaceholder'          => 'add project title'
-    
+    'titleplaceholder'          => 'add project title',
+    'YourDesigns'               => 'Your designs',
+    'DesignTitle'               => 'Design Title',
+    'Date'                      => 'Date',
+    'History'                   => 'History',
+    'SignOut'                   => 'Sign Out',
+    'ContactUs'                 => 'Contact us',
+    'TermsOfUse'                => 'Terms of use',
+    'Support'                   => 'Support',
+    'Tutorial'                  => 'Tutorial',
+    'Remove'                    => 'Remove'
 ];

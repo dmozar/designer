@@ -757,3 +757,31 @@ input:disabled {
     background: rgba(255,255,255,0.75);
     z-index:20;
 }
+
+.list-item-table {
+    width:100%;
+    font-size: 13px;
+    font-family: Roboto, sans-serif;
+}
+
+.list-item-table th, .list-item-table td {
+    padding: 5px 5px;
+}
+.list-item-table th {
+    background: #eee;
+}
+.list-item-table tr:nth-child(odd) td{
+    background: #fff;
+}
+.list-item-table tr:nth-child(even) td{
+    background: #fdfdfd;
+}
+
+.list-item-table td a {
+    color: inherit;
+}
+
+.list-item-table td:last-child, 
+.list-item-table th:last-child {
+    text-align: center;
+}

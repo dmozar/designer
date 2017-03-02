@@ -1,0 +1,20 @@
+<div class="container list-design-container">
+    
+    <h1><?=language('YourDesigns')?></h1>
+
+    <table class="list-item-table">
+        <thead>
+            <tr>
+                <th><?=language('DesignTitle')?></th>
+                <th width="150px"><?=language('Date')?></th>
+                <th width="80px"><?=language('Remove')?></th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php $this->partial('list_design_item',$this->items); ?>
+        </tbody>
+    </table>
+    
+    <?=$this->pagine?>
+</div>
+

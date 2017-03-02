@@ -52,9 +52,8 @@ class LoginHelper extends AbstractView implements ViewInterface {
             $opt = [
                 'redirect' => $r ? $r : Router::FromRoute('Imedia\Home', 'index')
             ];
-            $ViewModel =  $this->getView( $opt );
-            $ViewModel->get('success');
-            return $ViewModel;
+            
+            redirect( $opt['redirect'] );
         }
         
         if( $params['status'] == "error" ){

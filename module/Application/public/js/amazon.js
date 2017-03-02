@@ -139,7 +139,8 @@ var EditorClass = function(){
         'grid'      : '#ec-grid',
         'center'    : '#ec-center',
         'save'      : '#btnsv',
-        'saveasnew' : '#btnsn'
+        'saveasnew' : '#btnsn',
+        'compile'   : '#btngc'
     };
     
     /**
@@ -189,6 +190,7 @@ var EditorClass = function(){
         self.controls.center        = $(self.controls.center);
         self.controls.save          = $(self.controls.save);
         self.controls.saveasnew     = $(self.controls.saveasnew);
+        self.controls.compile       = $(self.controls.compile);
     };
     // </editor-fold>
     
@@ -209,6 +211,7 @@ var EditorClass = function(){
         self.controls.center.on ( 'click', self.CenterObject );
         self.controls.save.on ( 'click', self.SaveProject );
         self.controls.saveasnew.on ( 'click', self.SaveProject );
+        self.controls.compile.on( 'click', self.Compile );
         
         $('.editor-wrap, .btn-wrap').css('width',self.resolutions.desktop.width+'px');
         
@@ -224,6 +227,115 @@ var EditorClass = function(){
         $('.efr').on('click', self.RotateLeft);
         
         self.ElementListener( null );
+        
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="Compile">
+    this.Compile = function(){
+        
+        self.DisableEditor();
+        
+        var items = new Array();
+        
+        $.each( self.resolutions, function(i,e) {
+                var designer = e.history[e.hisindx-1];
+                var d = e.history[e.hisindx];
+                if(designer == undefined) designer = d;
+                
+                if( designer ){
+                    designer.find('.group-element').each(function(a,g){
+                        var obj = $(g);
+                        var id = obj.attr('id');
+                        var strHtml = obj.html();
+                        if( ! strHtml ) {
+                            strHtml = obj[0].innerHTML;
+                        }
+                        if(strHtml){
+                            items[id] = {
+                                html : obj.html(),
+                                properties: {}
+                            };
+                        }
+                    });
+                }
+            }
+        );
+        
+        setTimeout( function(){
+            __generate_properties( items );
+        },500, items);
+
+    };
+    // </editor-fold>
+    
+    var __generate_properties = function( items ){
+        
+        
+        
+        $.each( self.resolutions, function(i,e) {
+                var designer = e.history[e.hisindx-1];
+                var d = e.history[e.hisindx];
+                if(designer == undefined) designer = d;
+                
+                if(designer !== undefined){
+                    designer.find('.group-element').each( function(a,g){
+                        var obj = $(g);
+                        var id  = obj.attr('id');
+                        if(id){
+                            if(items[id] !== undefined){
+
+                                    if(items[id].properties[i] == undefined){
+                                        items[id]['properties'][i] = {
+                                            width                       : null,
+                                            height                      : null,
+                                            angle                       : null,
+                                            top                         : null,
+                                            left                        : null,
+                                            img                         : null,
+                                            imgrepeat                   : null,
+                                            imgposition                 : null,
+                                            imgsize                     : null,
+
+                                        };
+                                    }
+
+                                    items[id]['properties'][i].width            = obj.width();
+                                    items[id]['properties'][i].height           = obj.height();
+                                    items[id]['properties'][i].angle            = obj.data('angle');
+                                    items[id]['properties'][i].top              = parseInt(obj.css('top'));
+                                    items[id]['properties'][i].left             = parseInt(obj.css('left'));
+                                    items[id]['properties'][i].img              = parseInt(obj.css('background-img'));
+                                    items[id]['properties'][i].imgrepeat        = parseInt(obj.css('background-repeat'));
+                                    items[id]['properties'][i].imgsize          = parseInt(obj.css('background-size'));
+                            }
+                                
+                        }
+                    });
+                }
+        });
+        
+        setTimeout( function(){
+            console.log(items);
+        }, 1000, items);
+        
+        
+    };
+    
+    // <editor-fold defaultstate="collapsed" desc="DisableEditor">
+    this.DisableEditor = function(){
+        self.etc.append('<div class="loader"></div>');
+        $('#edd').append('<div class="mask-controls" />');
+        $('#eff').append('<div class="mask-controls" />');
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="EnableEditor">
+    this.EnableEditor = function(){
+        
+        self.etc.find('.loader').remove();
+        $('#edd').find('.mask-controls').remove();
+        $('#eff').find('.mask-controls').remove();
         
     };
     // </editor-fold>
@@ -1287,8 +1399,7 @@ var EditorClass = function(){
             obj,
             jsonString,
             $t,
-            _title,
-            loader = $('<div class="loader"></div>');
+            _title;
     
         self.etc.find('.grid').remove();
         self.grid = null;
@@ -1332,17 +1443,13 @@ var EditorClass = function(){
         
         
         
-        self.etc.append(loader);
-        $('#edd').append('<div class="mask-controls" />');
-        $('#eff').append('<div class="mask-controls" />');
+        self.DisableEditor();
         
         btn.addClass('disabled').prop('disabled','disabled');
 
         $.post(btn.data('url'), { json:jsonString, id:self.projectId, title:_title }, function(response){
 
-               loader.remove();
-               $('#edd').find('.mask-controls').remove();
-               $('#eff').find('.mask-controls').remove();
+               self.EnableEditor();
 
                if(response.status == true){
                    self.projectId = response.id;
@@ -1364,13 +1471,9 @@ var EditorClass = function(){
         var id =  self.etc.data('id');
         var url = self.etc.data('url');
         
-        var loader = $('<div class="loader"></div>');
-        self.etc.append(loader);
+        self.DisableEditor();
         
-        if(! id || ! url ) { loader.remove(); return false; }
-        
-        $('#edd').append('<div class="mask-controls" />');
-        $('#eff').append('<div class="mask-controls" />');
+        if(! id || ! url ) { self.EnableEditor(); return false; }
         
         $.post( url, {'id':id}, function(response){
             
@@ -1381,10 +1484,8 @@ var EditorClass = function(){
                 $('#ModalTitle').html(response.title);
                 $('#ModalText').html(response.message);
                 $('#Modal').modal('show');
-                loader.remove();
                 
-                $('#edd').find('.mask-controls').remove();
-                $('#eff').find('.mask-controls').remove();
+                self.EnableEditor();
                 
                 return false;
             }
@@ -1423,9 +1524,7 @@ var EditorClass = function(){
         setTimeout(function(){
             self.Refresh();
             setTimeout(function(){
-                self.etc.find('.loader').remove();
-                $('#edd').find('.mask-controls').remove();
-                $('#eff').find('.mask-controls').remove();
+                self.EnableEditor();
             },2000);
             
         },1000);
@@ -1489,6 +1588,5 @@ $(function(){ __init(); });};
 
 var Editor = new EditorClass();
 var Redirect = new RedirectClass();
-
 
 

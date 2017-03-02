@@ -1,0 +1,10 @@
+<div class="container editor-container">
+    <h1>Confirm delete project</h1>
+    <p>Are you shure that you want to remove this project? This cannot be undone!</p>
+   
+    <div class="form-group ">
+        <button onclick="window.history.back()" class="btn btn-default">Go Back</button>
+        <a href="<?=$this->item->getRemoveConfirmedUrl()?>" class="btn btn-danger">Remove</a>
+    </div>
+    
+</div>

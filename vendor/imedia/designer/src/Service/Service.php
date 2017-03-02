@@ -37,17 +37,101 @@ class Service implements ServiceInterface {
     private $Repository;
     
     /**
+     *
+     * @var type 
+     */
+    private $Limit = 30;
+    
+    /**
+     *
+     * @var type 
+     */
+    private $Offset = 0;
+    
+    /**
+     *
+     * @var type 
+     */
+    private $Page = 1;
+    
+    /**
+     *
+     * @var type 
+     */
+    private $Id;
+    
+    /**
      * 
      * @param type $options
      * @return \Imedia\Shop\Service\Service
      */
     public function create($options = array()) {
         
+        $RouteService   = $this->getServiceLocator()->Route;
+        $Route          = $RouteService->Route();
+        $params         = $Route->params_from_route();
+        
+        if( isset($params['page']) ) { $this->setPage ( $params['page'] ); $this->setOffset(); }
+        if(isset($options['page'])) { $this->setPage ( $options['page'] ); $this->setOffset(); }
+        if(isset($options['limit'])) $this->setLimit ( $options['limit'] );
+        if(isset($options['id'])) $this->setID ( $options['id'] );
+        if( isset($params['id']) ) { $this->setID ( $params['id'] ); }
+        
         $this->setEntityManager( DoctrineManager::get()->EntityManager() );
         $this->setRepository( $this->getEntityManager()->getRepository('Imedia\Designer\Entity\Design') );
 
         return $this;
     }
+    
+    /**
+     * 
+     * @param type $id
+     */
+    public function setID( $id ){ $this->Id = $id; }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getID(){ return $this->id; }
+    
+    
+    /**
+     * 
+     * @param type $page
+     */
+    public function setPage( $page ){ $this->Page = $page; $this->setOffset(); }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getPage(){ return $this->Page; }
+    
+    /**
+     * 
+     * @param type $limit
+     */
+    public function setLimit( $limit ){ $this->Limit = $limit; return $this; }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getLimit(){ return $this->Limit; }
+    
+    
+    /**
+     * 
+     * @return $this
+     */
+    public function setOffset(){ $this->Offset = ($this->Page * $this->Limit) - $this->Limit; return $this;}
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getOffset(){ return $this->Offset; }
     
     /**
      * 
@@ -90,9 +174,11 @@ class Service implements ServiceInterface {
         $Record = new Design;
         $Record->setUser( $User );
         
+        if( ! $design_id && $this->Id ) $design_id = $this->Id;
+        
         if($design_id)
-        if( ! $Record = $this->getRepository()->SingleDesign($design_id, $User) ) 
-        return null;
+            if( ! $Record = $this->getRepository()->SingleDesign($design_id, $User) ) 
+                    return null;
             
         return $Record;
     }
@@ -114,8 +200,7 @@ class Service implements ServiceInterface {
      * @param \Minty\Route\Http $Http
      */
     public function setHttp(\Minty\Route\Http $Http) { $this->Http = $Http; }
-    
-    
+
     /**
      * 
      * @param type $output
@@ -139,6 +224,9 @@ class Service implements ServiceInterface {
         try {
             $em->flush();
             
+            DoctrineManager::RemoveCache('designer_single');
+            DoctrineManager::RemoveCache('designer_list');
+            
             $output['id']       = $Design->getID();
             $output['status']   = true;
             $output['title']    = 'Info';
@@ -151,8 +239,6 @@ class Service implements ServiceInterface {
         return $output;
     }
     
-    
-
     /**
      * 
      * @param type $output
@@ -170,5 +256,11 @@ class Service implements ServiceInterface {
         
         return $output;
     }
+
+    /**
+     * 
+     * @return type
+     */
+    public function getListItems(){ return $this->getRepository()->setOptions(['offset'=>$this->getOffset(),'limit'=>$this->getLimit()])->getListItems(); }
 
 }

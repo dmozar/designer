@@ -2,6 +2,7 @@
 
 use Doctrine\ORM\Mapping as ORM;
 use Imedia\User\Entity\User;
+use Minty\Router;
 
 /**
  * @ORM\Entity(repositoryClass="Imedia\Designer\Repository\DesignRepository")
@@ -63,5 +64,9 @@ class Design {
     
     public function getTitle(){ return $this->title; }
     public function setTitle( $title ){ $this->title = $title; }
+    
+    public function getUrl(){ return Router::FromChilde('Imedia\Designer', 'index','item',[], [$this->id]); }
+    public function getRemoveUrl(){ return Router::FromRoute('Imedia\Designer', 'remove', [$this->id]); }
+    public function getRemoveConfirmedUrl(){ return Router::FromChilde('Imedia\Designer', 'remove', 'confirmed', [$this->id]); }
     
 }

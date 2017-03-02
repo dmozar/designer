@@ -29,12 +29,13 @@
               <?php endif;?> 
               <div class="footer-links clear">
                   <?php if(Minty\MVC::getUserData() ):?> 
-                  <a href="<?= site_url('logout')?>" class="pull-left">Sign Out</a> 
+                  <a href="<?= site_url('logout')?>" class="pull-left"><?=language('SignOut')?></a> 
+                  <a href="<?= Minty\Router::FromRoute('Imedia\Designer', 'history')?>" class="pull-left"><?=language('History')?></a> 
                   <?php endif;?> 
-                  <a href="" class="pull-right">Contact us</a>
-                  <a href="" class="pull-right">Terms of use</a>
-                  <a href="" class="pull-right">Support</a>
-                  <a href="" class="pull-right">Tutorial</a>
+                  <a href="" class="pull-right"><?=language('ContactUs')?></a>
+                  <a href="" class="pull-right"><?=language('TermsOfUse')?></a>
+                  <a href="" class="pull-right"><?=language('Support')?></a>
+                  <a href="" class="pull-right"><?=language('Tutorial')?></a>
               </div>
           </div>
       </footer>

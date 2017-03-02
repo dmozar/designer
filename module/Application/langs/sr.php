@@ -56,5 +56,15 @@ return [
     'UncategorizedError'        => 'Nastala je greška čiji uzrok nije otkriven. Molimo vas da kontaktirate našu podršku.',
     'DesignSaved'               => 'Projekat je uspešno sačuvan.',
     'TitleError'                => 'Naslov projekta je obavezno polje. Molimo unesite naziv vašeg projekta.',
-    'titleplaceholder'          => 'unesi naziv projekta'
+    'titleplaceholder'          => 'unesi naziv projekta',
+    'YourDesigns'               => 'Tvoji dizajni',
+    'DesignTitle'               => 'Naziv dizajna',
+    'Date'                      => 'Datum',
+    'History'                   => 'Istorijat',
+    'SignOut'                   => 'Odjava',
+    'ContactUs'                 => 'Kontakt',
+    'TermsOfUse'                => 'Uslovi korišćenja',
+    'Support'                   => 'Podrška',
+    'Tutorial'                  => 'Uputstva',
+    'Remove'                    => 'Obriši'
 ];

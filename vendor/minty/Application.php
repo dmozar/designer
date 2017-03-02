@@ -123,6 +123,7 @@ class Application extends ServiceLocator {
         
         \Minty\Helper\HelperManager::get()->load('url');
         \Minty\Helper\HelperManager::get()->load('string');
+        \Minty\Helper\HelperManager::get()->load('pagination');
         
         $Application = new Application;
         
