@@ -127,9 +127,9 @@ return $config = [
      */
     'database' => [
         'host'      => 'localhost',
-        'db'        => 'shop',
+        'db'        => 'designer',
         'user'      => 'root',
-        'pass'      => '',
+        'pass'      => 'Dexilo2dexilo.',
         'charset'   => 'utf8',
         'prefix'    => '',
         'proxy_path'=> PATH_ROOT . 'data/proxies/',

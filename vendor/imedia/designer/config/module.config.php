@@ -120,7 +120,7 @@ return [
             'designer.css'      => __DIR__ . '/../public/css/designer.css'
         ],
         'js' => [
-            
+            'designer.js'      => __DIR__ . '/../public/js/designer.js'
         ],
     ]
     
