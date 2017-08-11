@@ -16,7 +16,8 @@
         "rwoverdijk/assetmanager": "1.*",
         "verot/class.upload.php": "dev-master",
         "eventviva/php-image-resize": "1.6.*",
-        "doctrine/orm": "*"
+        "doctrine/orm": "*",
+        "beberlei/DoctrineExtensions": "dev-master"
     },
     "autoload": {
         "psr-4": {

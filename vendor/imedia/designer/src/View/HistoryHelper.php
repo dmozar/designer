@@ -38,11 +38,13 @@ class HistoryHelper extends AbstractView implements ViewInterface {
         
         $ViewModel = $this->getView();
         
+        $opt = $this->Search();
+        
         $options = [
-            'items' => $Service->getListItems(),
+            'items' => $Service->getListItems( $opt ),
         ];
         
-        $jokerUrl = \Minty\Router::FromChilde('Imedia\Designer', 'index', 'item', [], ['%s']);
+        $jokerUrl = \Minty\Router::FromChilde('Imedia\Designer', 'history', 'page', [], ['00000000']);
         
         $options = [
             'items' => $options['items'] ? $options['items'] : [],
@@ -53,7 +55,8 @@ class HistoryHelper extends AbstractView implements ViewInterface {
                     count($options['items']), 
                     true, 
                     $jokerUrl 
-            )
+            ),
+            'search' => $opt
         ];
         
         $ViewModel =  $this->getView( $options );
@@ -62,6 +65,29 @@ class HistoryHelper extends AbstractView implements ViewInterface {
         
         return $ViewModel;
         
+    }
+    
+    
+    /**
+     * 
+     * @return \stdClass
+     */
+    private function Search(){
+        if(isset($_COOKIE['search'])){
+            $opt = json_decode( $_COOKIE['search']);
+        } else {
+            $opt = null;
+        }
+        
+        if( ! $opt ){
+            $opt = new \stdClass();
+            $opt->keywords = null;
+            $opt->date     = null;
+        } else {
+            $opt->keywords = isset($opt->keywords) ? $opt->keywords : null;
+            $opt->date     = isset($opt->date) ? $opt->date : null;
+        }
+        return $opt;
     }
     
     

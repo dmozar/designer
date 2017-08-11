@@ -55,7 +55,7 @@ return [
             'method' => 'history',
             'action' => 'http',
             'children' => [
-                'submit' => [
+                'page' => [
                     'route' => '/(?P<page>\d+)',
                     'constraints' => [
                         'page' => 1,
@@ -88,6 +88,9 @@ return [
             ]
         ],
     ],
+    
+    
+    'sessKey' => 'ci_credential',
     
     
     'services' => [

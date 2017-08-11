@@ -63,7 +63,7 @@ class Controller extends Module {
         
         $Service = $this->getServiceLocator()->get('DesignerService');
         
-        OutputManager::get()->json( $Service->Save($output, $json, $Http->getFromPost('title'), $Http->getFromPost('id') ) );
+        OutputManager::get()->json( $Service->Save($output, $json, $Http->getFromPost('title'), $Http->getFromPost('id'), $Http->getFromPost('fonts') ) );
         
     }
     

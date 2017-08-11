@@ -120,6 +120,8 @@ var EditorClass = function(){
      * 
      */
     this.gridStep = 40;
+    
+    this.fonts = "";
 
     /**
      * 
@@ -140,7 +142,10 @@ var EditorClass = function(){
         'center'    : '#ec-center',
         'save'      : '#btnsv',
         'saveasnew' : '#btnsn',
-        'compile'   : '#btngc'
+        'compile'   : '#btngc',
+        'div'       : '#ec-div',
+        'textstyle' : '#ec-textstyle',
+        'textfont'  : '#ec-textfont'
     };
     
     /**
@@ -191,6 +196,10 @@ var EditorClass = function(){
         self.controls.save          = $(self.controls.save);
         self.controls.saveasnew     = $(self.controls.saveasnew);
         self.controls.compile       = $(self.controls.compile);
+        self.controls.div           = $(self.controls.div);
+        self.controls.textstyle     = $(self.controls.textstyle);
+        self.controls.textfont      = $(self.controls.textfont);
+        
     };
     // </editor-fold>
     
@@ -212,11 +221,15 @@ var EditorClass = function(){
         self.controls.save.on ( 'click', self.SaveProject );
         self.controls.saveasnew.on ( 'click', self.SaveProject );
         self.controls.compile.on( 'click', self.Compile );
+        self.controls.div.on  ( 'click', self.EditDiv );
+        self.controls.textstyle.on  ( 'click', self.TextStyle );
+        self.controls.textfont.on  ( 'click', self.TextFont );
         
         var dw = self.resolutions.desktop.width;
-        if(dw < 1120) dw = 1120;
+        //if(dw < 1120) dw = 1120;
         $('.editor-wrap, .btn-wrap').css('width',dw+'px');
         $('#width').val(dw).trigger('change');
+        $('.editor-wrap').css('width',dw);
         $('#design-editor').width(dw);
         
         $('.editor-controlls li').on('click', function(){
@@ -240,18 +253,26 @@ var EditorClass = function(){
         
         self.DisableEditor();
         
-        var items = new Array();
+        var items = {};
+        
+        
         
         $.each( self.resolutions, function(i,e) {
-                var designer = e.history[e.hisindx-1];
-                var d = e.history[e.hisindx];
+                try{
+                    var designer = e.history[e.hisindx-1];
+                    var d = e.history[e.hisindx];
+                } catch(eee){}
                 if(designer == undefined) designer = d;
                 
                 if( designer ){
                     designer.find('.group-element').each(function(a,g){
+
+                        
                         var obj = $(g);
+                        
                         var id = obj.attr('id');
                         var strHtml = obj.html();
+                        
                         if( ! strHtml ) {
                             strHtml = obj[0].innerHTML;
                             if( ! strHtml ){
@@ -268,6 +289,8 @@ var EditorClass = function(){
                 }
             }
         );
+
+        $('#generatedcode').text('');
         
         setTimeout( function(){
             __generate_properties( items );
@@ -276,18 +299,32 @@ var EditorClass = function(){
     };
     // </editor-fold>
     
+    // <editor-fold defaultstate="collapsed" desc="__generate_properties">
     var __generate_properties = function( items ){
-        
-        
-        
+
         $.each( self.resolutions, function(i,e) {
-                var designer = e.history[e.hisindx-1];
-                var d = e.history[e.hisindx];
-                if(designer == undefined) designer = d;
+                try{
+                    var designer = e.history[e.hisindx-1];
+                    var d = e.history[e.hisindx];
+                    if(designer == undefined) designer = d;
+                }catch(eee){}
                 
                 if(designer !== undefined){
                     designer.find('.group-element').each( function(a,g){
                         var obj = $(g);
+                        var clr = "#000";
+                        var bgc = 'transparent';
+                        var pdf = obj.find('.editable-div');
+                        if(pdf.length){
+                            var bgc2 = pdf.css('backgroundColor');
+                            if(bgc2){
+                                    bgc = bgc2;
+                                    obj.css('backgroundColor',bgc);
+                            }
+                        }
+                        
+                       
+                        
                         var id  = obj.attr('id');
                         if(id){
                             if(items[id] !== undefined){
@@ -303,31 +340,391 @@ var EditorClass = function(){
                                             imgrepeat                   : null,
                                             imgposition                 : null,
                                             imgsize                     : null,
+                                            'z-index'                   : null,
+                                            'text-align'                : 'left',
+                                            'background-color'          : bgc,
+                                            'color':                    '#000',
+                                            'font-size':                '20px',
+                                            'line-height':              '0px',
+                                            'font-family':              null,
 
                                         };
                                     }
+                                    
+                                    
+                                    var color = obj.css('color');
+                                    if(color !== 'inherit' && color !== ''){
+                                        obj.css('color',color);
+                                        items[id]['properties'][i]['color'] = color;
 
-                                    items[id]['properties'][i].width            = obj.width();
-                                    items[id]['properties'][i].height           = obj.height();
+                                    }
+                                    
+                                    
+                                    
+                                    if(items[id].type == undefined){
+                                        items[id].type = null;
+                                    }
+
+                                    self.define_types(items, obj, id);
+
+                                    var W = self.resolutions[i].width;
+                                    var prc = (obj.data('width')/W)*100;
+                                    
+                                    var H = self.resolutions[i].height;
+                                    var hrc = (obj.data('height')/H)*100;
+                                    
+                                    var L = parseInt(obj.css('left'));
+                                    var x = (L/W)*100;
+                                    
+   
+
+                                    items[id]['properties'][i].width            = prc;
+                                    items[id]['properties'][i].height           = hrc;
                                     items[id]['properties'][i].angle            = obj.data('angle');
                                     items[id]['properties'][i].top              = parseInt(obj.css('top'));
-                                    items[id]['properties'][i].left             = parseInt(obj.css('left'));
-                                    items[id]['properties'][i].img              = parseInt(obj.css('background-img'));
-                                    items[id]['properties'][i].imgrepeat        = parseInt(obj.css('background-repeat'));
-                                    items[id]['properties'][i].imgsize          = parseInt(obj.css('background-size'));
+                                    items[id]['properties'][i].left             = x;
+                                    items[id]['properties'][i].img              = obj.css('background-image');
+                                    items[id]['properties'][i].imgrepeat        = obj.css('background-repeat');
+                                    items[id]['properties'][i].imgsize          = obj.css('background-size');
+                                    items[id]['properties'][i]['z-index']       = obj.css('z-index');
+                                    items[id]['properties'][i]['text-align']    = obj.css('text-align');
+
+                                    items[id]['properties'][i]['background-color']  = obj.css('background-color');
+                                    items[id]['properties'][i]['font-size']     = obj.css('font-size');
+                                    items[id]['properties'][i]['line-height']   = obj.css('line-height');
+                                    
+                                    var ff = obj.css('font-family');
+                                    if(ff){
+                                        items[id]['properties'][i]['font-family']   = obj.css('font-family');
+                                    }
+                
+
+                                    if( ! items[id]['properties'][i].top )
+                                        items[id]['properties'][i].top = 0;
+                                    
+                                    if( ! items[id]['properties'][i].left )
+                                        items[id]['properties'][i].left = 0;
+                                    
                             }
-                                
                         }
                     });
                 }
         });
         
         setTimeout( function(){
-            console.log(items);
+            __generate_code( items );
         }, 1000, items);
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="__generate_code">
+    var __generate_code = function( items ){
+        
+        var strCss    = "";
+        var strHtml    = "";
+        
+        var styleTemplate = {
+            'property':             null,
+            'width':                null,
+            'height':               null,
+            'transform':            new Array() ,
+            'background-image':     null,
+            'background-color':     null,
+            'background-repeat':    'no-repeat',
+            'background-size':      null,
+            'top':                  null,
+            'left':                 null,
+            'right':                null,
+            'bottom':               null,
+            'z-index':              5,
+            'text-align':           'left',
+            'color':                '#000',
+            'font-size':            '20px',
+            'line-height':          '0px',
+            'font-family':          null,
+        };
+        
+        var styles = {
+            desktop:                {property:null,width:null,height:null,items:{}},
+            tablet:                 {property:null,width:null,height:null,items:{}},
+            mobilehd:               {property:null,width:null,height:null,items:{}},
+            mobile:                 {property:null,width:null,height:null,items:{}},
+            mobilesmall:            {property:null,width:null,height:null,items:{}},
+        };
+        
+        
+        
+        styles.desktop.property     = "/* Desktop */ \n@media only screen and (min-width: "+ self.resolutions.tablet.width +"px) { \n";
+        styles.tablet.property      = "/* Tablet */ \n@media only screen and (min-width: "+ self.resolutions['mobile-hd'].width +"px) and (max-width: "+self.resolutions.tablet.width+"px) { \n";
+        styles.mobilehd.property    = "/* Mobile HD */ \n@media only screen and (min-width: "+ self.resolutions['mobile'].width +"px) and (max-width: "+self.resolutions['mobile-hd'].width+"px) { \n";
+        styles.mobile.property      = "/* Mobile */ \n@media only screen and (min-width: "+ self.resolutions['mobile-small'].width +"px) and (max-width: "+self.resolutions['mobile'].width+"px) { \n";
+        styles.mobilesmall.property = "/* iPhone 4 */ \n@media only screen and (min-width: 300px) and (max-width: "+self.resolutions['mobile-small'].width+"px) { \n";
+        
+        styles.desktop.width        = self.resolutions.desktop.width;
+        styles.desktop.height       = self.resolutions.desktop.height;
+        styles.tablet.width         = self.resolutions.tablet.width;
+        styles.tablet.height        = self.resolutions.tablet.height;
+        styles.mobilehd.width       = self.resolutions['mobile-hd'].width;
+        styles.mobilehd.height      = self.resolutions['mobile-hd'].height;
+        styles.mobile.width         = self.resolutions.mobile.width;
+        styles.mobile.height        = self.resolutions.mobile.height;
+        styles.mobilesmall.width    = self.resolutions['mobile-small'].width;
+        styles.mobilesmall.height   = self.resolutions['mobile-small'].height;
+        
+         
+        strCss+= '.designer-wrap, .designer-wrap * {text-transform: initial;line-height:18px;text-decoration:none;font-family:sans-serif;font-size:14px;width:auto;height:auto;background:transparent;background-color:transparent;border:none;border-color:transparent;margin:0 !important;padding:0 !important;line-height:initial;top:initial;left:initial;right:initial;bottom:initial;max-width:initial;min-width:0;}'+'\n';
+        strCss+= '.designer-div .editable-div {width:100% !important;height:100% !important;} \n';
+        strCss+= '.designer-image img.editable-img {width:100% !important;height:100% !important;} \n';
+        strCss+= '.designer-wrap {margin:auto !important;} \n';
+        
+        
+        
+        $.each( items, function( _id, j){
+            
+            
+            strCss+= '#' + _id + ' {text-decoration:none;font-family:sans-serif;width:auto;height:auto;background:transparent;background-color:transparent;border:none;border-color:transparent;margin:0;padding:0;line-height:initial;top:initial;left:initial;right:initial;bottom:initial;max-width:initial;min-width:0;}'+'\n';
+            
+            $.each(j.properties, function(n,p){
+                
+                var resolution = n.replace(/-/g,'');
+                var resObj     = self.resolutions[n];
+                
+                if( styles[resolution].items[_id] == undefined )
+                    styles[resolution].items[_id] = JSON.parse(JSON.stringify(styleTemplate));
+
+                $.each(p, function(z,d){
+                    
+                    if(z == 'z-index' && ! d){
+                        d = 5;
+                    }
+                    
+                    if(  d !== undefined && d !== null && d != 'NaN' ){
+                        switch (z){
+                            case 'background-color':
+                                styles[resolution].items[_id]['background-color'] = d;
+                            break;
+                            case 'color':
+                                styles[resolution].items[_id]['color'] = d + ' !important';
+                       
+                            break;
+                            case 'line-height':
+                                styles[resolution].items[_id]['line-height'] = d + ' !important';
+                            break;
+                            case 'font-family':
+                                if(d)
+                                styles[resolution].items[_id]['font-family'] = d;
+                            break;
+                            case 'font-size':
+                                styles[resolution].items[_id]['font-size'] = d + ' !important';
+                       
+                            break;
+                            case 'img':
+                                styles[resolution].items[_id]['background-image'] = d;
+                            break;
+                            case 'imgrepeat':
+                                styles[resolution].items[_id]['background-repeat'] = d;
+                            break;
+                            case 'imgposition':
+                                styles[resolution].items[_id]['background-position'] = d;
+                            break;
+                            case 'imgsize':
+                                styles[resolution].items[_id]['background-size'] = d;
+                            break;
+                            case 'z-index':
+                                styles[resolution].items[_id]['z-index'] = d;
+                            break;
+                            case 'width':
+                               if(d > 0)
+                               styles[resolution].items[_id].width = d + '%';
+                            break;
+                            case 'height':
+                               if(d > 0)
+                               styles[resolution].items[_id].height = d + '%';
+                            break;
+                            case 'angle':
+                               styles[resolution].items[_id].transform.push('rotate('+d + 'deg)');
+                            break;
+                            case 'top':
+                                styles[resolution].items[_id].top  = d + 'px';
+                                styles[resolution].items[_id].bottom = 'auto';
+                            break;
+                            case 'left':
+                                styles[resolution].items[_id].left  = d + '%';
+                                styles[resolution].items[_id].right = 'auto';
+                            break;
+                            case 'text-align':
+                                styles[resolution].items[_id]['text-align']  = d + ' !important';
+                            break;
+                            
+
+                        }
+                    }
+                });
+            });
+        });
+        
+        
+        var uid = self.UUID();
+        
+        setTimeout( function(){
+            
+            
+            strCss+= '.designer-element { -webkit-transition:all .3s ease-in-out;-moz-transition:all .3s ease-in-out;-o-transition:all .3s ease-in-out;transition:all .3s ease-in-out; }\n';
+            
+
+            /* Generate CSS */
+            $.each(styles, function(i,e){
+                
+                strCss += e.property;
+                
+                    strCss += '\t#'+uid + ' { display:block;position:relative;width:100%;max-width:'+e.width+'px;height:'+e.height+'px;overflow:hidden; }\n';
+                    
+                    $.each(e.items, function(id,x){
+                        
+                        strCss += '\t#'+id + '{ display:block; position: absolute;';
+       
+                        $.each(x, function(pp,vv){
+                            if(vv && pp !== 'transform'){
+                                strCss += pp + ':' + vv + ';';
+                            } else {
+                                if(self.ObjectSize(vv)){
+                                    var transformStr = "";
+                                    $.each(vv, function(b,r){
+                                        transformStr += r+',';
+                                    });
+                                    transformStr = transformStr.substring(0, transformStr.length - 1);
+                                    
+                                    strCss += 'transform:' + transformStr + ';';
+                                    strCss += '-o-transform:' + transformStr + ';';
+                                    strCss += '-moz-transform:' + transformStr + ';';
+                                    strCss += '-webkit-transform:' + transformStr + ';';
+                                    strCss += '-khtml-transform:' + transformStr + ';';
+                                }
+                            }
+                        });
+                        
+                        strCss += '}\n';
+                        
+                    });
+                
+                strCss += '}\n';
+            });
+            
+            strHtml = '<!-- visual designer start -->\n';
+            
+            
+            if(self.fonts){
+                try {
+                    var string = JSON.parse(self.fonts);
+                    $.each(string, function(i,m){
+
+                         strHtml+=('<link href="'+m.link+'" rel="stylesheet">');
+
+                    });
+
+                }catch(eee){ console.log(eee);}
+            }
+            
+            
+            strHtml += '<div id="'+uid+'" class="designer-wrap">\n';
+            
+            /* Generate HTML */
+            $.each(items, function(id, obj){
+               
+                switch (obj.type){
+                    
+                    case 'IMAGE':
+                        strHtml += '<div id="'+id+'" class="designer-image designer-element">'+obj.html+'</div>\n';
+                    break;
+                    case 'DIV':
+                        strHtml += '<div id="'+id+'" class="designer-div designer-element" >'+obj.html+'</div>\n';
+                    break;
+                    case 'TEXT':
+                        strHtml += '<div id="'+id+'" class="designer-text designer-element" >'+obj.html+'</div>\n';
+                    break;
+                    case 'VIDEO':
+                        strHtml += '<div id="'+id+'" class="designer-video designer-element">'+obj.html+'</div>\n';
+                    break;
+                    case 'BACKGROUND':
+                        strHtml += '<div id="'+id+'" class="designer-bg designer-element"></div>\n';
+                    break;
+                }
+                
+            });
+            
+            strHtml += '</div>\n';
+            
+            strHtml = strHtml.replace(/[\r\n]+/g, '\n\n');
+            strHtml = strHtml.replace(/[\r\n]+/g, '\n');
+            
+            strHtml = strHtml.replace(/;color:[^;]*;/g, ";"); 
+            strHtml = strHtml.replace(/"color:[^;]*;/g, "\""); 
+            
+            strCode = '<style>\n';
+            strCode+= strCss;
+            strCode+= '</style>\n';
+            strCode+= strHtml;
+            
+            strCode = strCode.replace(/style="text-align: left;"/g,'');
+            strCode = strCode.replace(/style="text-align: center;"/g,'');
+            strCode = strCode.replace(/style="text-align: right;"/g,'');
+            
+            strHtml = '<!-- visual designer end -->\n';
+
+            self.EnableEditor();
+            
+            
+            
+            $('.code-console').addClass('active'); 
+            $('#generatedcode').text(strCode);
+            
+            self.winHtml = '<html><head><meta charset="utf-8"> <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"><meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, width=device-width"> <title>Preview</title><style>body,head {margin:0;padding:0;}</style></head><body>'+strCode+'</body></html>';
+            $('#previewbtn').remove();
+            $('#generatedcode').closest('.col-md-12').append('<button id="previewbtn" type="button" onclick="Editor.Preview()">Preview Code</button>');
+            
+            
+        },1000);
+        
+        
+        
+        
         
         
     };
+    // </editor-fold>
+    
+    
+    this.Preview = function(){
+        var win = window.open("", "Preview", "toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, width="+screen.width - 100+", height="+screen.height - 100+", top=0, left=0");
+        win.document.body.innerHTML = self.winHtml;
+    };
+    
+    this.winHtml = '';
+    
+    // <editor-fold defaultstate="collapsed" desc="define_types">
+    this.define_types = function (items, obj, id ){
+        
+        switch ( obj.data('action') ){       
+            case 'Editor.EditBackground':
+                items[id].type = 'BACKGROUND';
+            break;
+            case 'Editor.EditImage':
+                items[id].type = 'IMAGE';
+            break;
+            case 'Editor.EditText':
+                items[id].type = 'TEXT';
+            break;
+            case 'Editor.EditDiv':
+                items[id].type = 'DIV';
+            break;
+            case 'Editor.EditVideo':
+                items[id].type = 'VIDEO';
+            break;
+        }
+        
+        return items;
+    }
+    // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc="DisableEditor">
     this.DisableEditor = function(){
@@ -485,14 +882,70 @@ var EditorClass = function(){
     // <editor-fold defaultstate="collapsed" desc="Resolution">
     this.Resolution = function(){
         
+        var def = self.resolutions['desktop'];
+        $.each(self.resolutions, function(i,e){
+            if(parseInt(e.width) == 0){
+                switch (i){
+                    case 'desktop':
+                        self.resolutions['desktop'].width = 1120;
+                    break;
+                    case 'tablet':
+                        self.resolutions['tablet'].width = 1024;
+                    break;
+                    case 'mobile-hd':
+                        self.resolutions['mobile-hd'].width = 768;
+                    break;
+                    case 'mobile':
+                        self.resolutions['mobile'].width = 480;
+                    break;
+                    case 'mobile-small':
+                        self.resolutions['mobile-small'].width = 340;
+                    break;
+                }
+            }
+            if(parseInt(e.height) == 0){
+                self.resolutions[i].height = def.height;
+            }
+        });
+        
         var select = self.etc.closest('.editor-wrap').find('.resolution select');
         $.each(self.resolutions, function(i,e){
             select.append('<option value="'+i+'">'+i+'</option>');
         });
         select.on('change', function(){
+            
+                var def = self.resolutions['desktop'];
+                $.each(self.resolutions, function(ia,ea){
+                    if(parseInt(ea.width) == 0){
+                        switch (ia){
+                            case 'desktop':
+                                self.resolutions['desktop'].width = 1120;
+                            break;
+                            case 'tablet':
+                                self.resolutions['tablet'].width = 1024;
+                            break;
+                            case 'mobile-hd':
+                                self.resolutions['mobile-hd'].width = 768;
+                            break;
+                            case 'mobile':
+                                self.resolutions['mobile'].width = 480;
+                            break;
+                            case 'mobile-small':
+                                self.resolutions['mobile-small'].width = 340;
+                            break;
+                        }
+                    }
+                    if(parseInt(ea.height) == 0){
+                        self.resolutions[ia].height = def.height;
+                    }
+                });
+            
+            
+ 
             var t = ($(this).find('option:selected').val());
             var resolution = self.resolutions[t];
             $('#width').val(resolution.width).trigger('change');
+            $('.editor-wrap').css('width',resolution.width);
             //$('.btn-wrap').css('width',resolution.width+'px');
             self.currentResolution = t;
             self.resolutions[self.currentResolution].hisindx--;
@@ -518,16 +971,19 @@ var EditorClass = function(){
         $.each(self.resolutions, function(i,e){
             
             var indx = e.hisindx;
-            
-            var obj = e.history[indx];
+            try {
+                var obj = e.history[indx];
+           
             
             if( obj == undefined){
                 obj = e.history[indx-1];
             }
             
+             } catch(eeee){}
+            
             if(obj !== undefined){
                 if(self.ObjectSize(obj)){
-                    console.log(obj);
+            
                     obj.find('.group-element').each(function(a,s){
                         var $s = $(s);
                         var id = $s.attr('id');
@@ -620,7 +1076,7 @@ var EditorClass = function(){
         
         $('#width').on('change', function(){ 
             var w = $(this).val();
-            self.etc.width( w ); /*self.etc.closest('.editor-wrap').width( w );*/ 
+            self.etc.width( w ); self.etc.closest('.editor-wrap').width( w );
             setTimeout(function(){
                 self.resolutions[self.currentResolution]['width'] = w;
             },120,w);
@@ -642,8 +1098,10 @@ var EditorClass = function(){
             var a = self.etc.find('.group-element.active');
             if(a.length){
                 a.width( $(this).val() );
+                a.attr('data-width',$(this).val() );
                 if(a.data('action') == 'Editor.EditImage') { a.find('img').width( $(this).val() ); }
                 if(a.data('action') == 'Editor.EditVideo') { a.find('iframe').width( $(this).val() ); }
+                if(a.data('action') == 'Editor.EditDiv') { a.find('.editable-div').width( $(this).val() ); }
                 $('#eheight').val(a.height());
                 self.HistoryPushState();
             }
@@ -653,8 +1111,10 @@ var EditorClass = function(){
             var a = self.etc.find('.group-element.active');
             if(a.length){
                 a.height( $(this).val() );
+                a.attr('data-height',$(this).val() );
                 if(a.data('action') == 'Editor.EditImage') { a.find('img').height( $(this).val() ); }
                 if(a.data('action') == 'Editor.EditVideo') { a.find('iframe').height( $(this).val() ); }
+                if(a.data('action') == 'Editor.EditDiv') { a.find('.editable-div').height( $(this).val() ); }
                 $('#ewidth').val(a.width());
                 self.HistoryPushState();
             }
@@ -664,20 +1124,22 @@ var EditorClass = function(){
 
     // <editor-fold defaultstate="collapsed" desc="HistoryPushState">
     this.HistoryPushState = function(){
-        var code = self.etc.clone(true,true);
-        
-        if(code !== self.lastSelection){
-            self.lastSelection = code;
-            self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx] = code;
-            self.resolutions[self.currentResolution].hisindx++;
-            self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
-            
-            
-        }
-        
-        self.ControlUndoRedoButtons();
-        
-        var size = ( self.ObjectSize(self.resolutions[self.currentResolution].history) );
+        try{
+            var code = self.etc.clone(true,true);
+
+            if(code !== self.lastSelection){
+                self.lastSelection = code;
+                self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx] = code;
+                self.resolutions[self.currentResolution].hisindx++;
+                self.lastHistoryIndx = self.resolutions[self.currentResolution].hisindx;
+
+
+            }
+
+            self.ControlUndoRedoButtons();
+
+            var size = ( self.ObjectSize(self.resolutions[self.currentResolution].history) );
+        } catch(ee){}
         
     }; 
     // </editor-fold>
@@ -703,19 +1165,21 @@ var EditorClass = function(){
 
     // <editor-fold defaultstate="collapsed" desc="Refresh">
     this.Refresh = function(){
-        var code = self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx];
-        if(code){
-            if( code.length){
-                $('body').find('.editor').replaceWith( code );
-                self.etc = $('body').find('.editor');
-                self.etc.find('.group-element').each(function(i,e){
-                    self.ElementBind( $(e) );
-                });
-                self.etc.width( self.resolutions[self.currentResolution].width );
-                self.etc.height( self.resolutions[self.currentResolution].height );
+        try {
+            var code = self.resolutions[self.currentResolution].history[self.resolutions[self.currentResolution].hisindx];
+            if(code){
+                if( code.length){
+                    $('body').find('.editor').replaceWith( code );
+                    self.etc = $('body').find('.editor');
+                    self.etc.find('.group-element').each(function(i,e){
+                        self.ElementBind( $(e) );
+                    });
+                    self.etc.width( self.resolutions[self.currentResolution].width );
+                    self.etc.height( self.resolutions[self.currentResolution].height );
+                }
             }
-        }
-        self.ControlUndoRedoButtons();
+            self.ControlUndoRedoButtons();
+        } catch(eee){}
     };
     // </editor-fold>
 
@@ -756,6 +1220,21 @@ var EditorClass = function(){
         self.ControlUndoRedoButtons();
     };
     // </editor-fold>
+    
+    this.ElementUnbind = function($e){
+        var c = $e.clone(false,false);
+        $e.replaceWith(c);
+        $e = c;
+        $e.unbind();
+        try {
+            $e.draggable('destroy');
+            /*$e.resizable('destroy');*/
+        }
+        catch(e) {
+            
+        }
+        /*$e.find('.ui-resizable-handle').remove();*/
+    }
 
     // <editor-fold defaultstate="collapsed" desc="ElementBind">
     this.ElementBind = function( $e ){
@@ -765,10 +1244,31 @@ var EditorClass = function(){
         $e = c;
         try {
             $e.draggable('destroy');
+            /*$e.resizable('destroy');*/
         }
         catch(e) {
             
         }
+        
+        $e.attr('data-width',$e[0].clientWidth);
+        $e.attr('data-height',$e[0].clientHeight);
+        
+        /*if($e.hasClass('ui-resizable-handle')){
+            $e.resizable('destroy');
+            $e.find('.ui-resizable-handle').remove();
+        }*/
+        /*$e.resizable({
+            aspectRatio: false,
+            resize: function( event, ui ) {
+                $(this).children().not('.ui-resizable-handle').width( $(this).width() );
+                $(this).children().not('.ui-resizable-handle').height( $(this).height() );
+                $('.ef #width').val($(this).width());
+                $('.ef #height').val($(this).height());
+                $(this).data('width',$(this).width());
+                $(this).data('height',$(this).height());
+            }
+        });*/
+        
         $e.draggable({
             stop: self.HistoryPushState,
             disabled:false,
@@ -985,6 +1485,8 @@ var EditorClass = function(){
         self.controls.text.addClass('disabled').removeClass('active');
         self.controls.expand.addClass('disabled').removeClass('active');
         self.controls.center.addClass('disabled').removeClass('active');
+        self.controls.textstyle.addClass('disabled').removeClass('active');
+        self.controls.div.addClass('disabled').removeClass('active');
         
         if(self.ActiveElement !== null){
             self.controls.center.removeClass('disabled');
@@ -1045,10 +1547,21 @@ var EditorClass = function(){
                 self.controls.link.removeClass('disabled');
                 self.controls.link.removeClass('active');
                 self.controls.expand.removeClass('disabled');
+                self.controls.textstyle.removeClass('disabled');
                 $('#angle').removeAttr('disabled');
                 if($e.has('a').length){
                     self.controls.link.addClass('active');
                 }
+                
+            },100);
+        } 
+        
+        if($e.data('action') == 'Editor.EditDiv'){
+
+            setTimeout(function(){
+                self.controls.delete.removeClass('disabled');
+                self.controls.expand.removeClass('disabled');
+                $('#angle').removeAttr('disabled');
                 
             },100);
         } 
@@ -1070,6 +1583,176 @@ var EditorClass = function(){
         
     };
     // </editor-fold>
+    
+    
+    this.rgb2hex = function(rgb){
+        rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+        return (rgb && rgb.length === 4) ? "#" +
+         ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+         ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+         ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+    };
+    
+    
+    
+    this.TextFont = function(){
+        
+        var html = self.CloneTemplate('textfont');
+        var str = '';
+        var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
+        var textarea = $html.find('textarea[name=fontlist]');
+        var fontList = self.fonts;
+        if(fontList){
+            fontList = JSON.parse(fontList);
+            
+            
+            if(fontList){
+                $.each(fontList, function(a,b){
+                    str+=b.link+','+b.name+"\n";
+                });
+            } 
+        }
+        textarea.val(str);
+    };
+    
+    
+    this.SubmitTextFont = function(e){
+        
+        var $e          = self.etc.find('.group-element.active');
+        var p           = $(e).closest('.pop-window');
+        
+        var holder = $('#fonts-holder');
+        holder.html('');
+        
+        var string = p.find('textarea[name=fontlist]').val();
+        string = string.split(/\n/g);
+        
+        var fontList = {};
+        if(string.length){
+            try {
+                
+                $.each(string, function(i,m){
+                    
+                    if(m.trim().length){
+                        var f = m.split(',');
+                        if(f){
+                            if(f.length == 2){
+                                var link = f[0];
+                                link = link.trim();
+                                var name = f[1];
+                                name = name.trim();
+                                fontList[i] = {
+                                    'link': link,
+                                    'name': name
+                                };
+                                holder.append('<link href="'+link+'" rel="stylesheet">');
+                            }
+                        }
+                    }
+                    
+                });
+                
+                self.fonts = JSON.stringify(fontList);
+                
+            }catch(eee){ console.log(eee);}
+        }
+            
+        self.CancelPopWindow(e);
+        self.HistoryPushState();
+        
+        
+    };
+    
+    
+    
+    this.TextStyle = function(e){
+
+        var html = self.CloneTemplate('textstyle');
+        
+        var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
+        
+        
+        
+        var $e          = self.etc.find('.group-element.active');
+        var color       = $e.css('color');
+        var lineHeight  = $e.css('line-height');
+        var textSize    = $e.css('font-size');
+        
+        
+        
+        var select = $html.find('select[name=fontfamily]');
+        select.append('<option value="inherit" selected>inherit</option>');
+        select.append('<option value="sans-serif">Sans Serif</option>');
+        select.append('<option value="">Arial</option>');
+        
+        var fontList = self.fonts;
+        if(fontList){
+            fontList = JSON.parse(fontList);
+            
+            
+            if(fontList){
+                $.each(fontList, function(a,b){
+                    select.append('<option value="'+b.name+'">'+b.name+'</option>');
+                });
+            } 
+        }
+
+        $html.find('#textsize').val(textSize);
+        
+        $html.find('#textline').val(lineHeight);
+        
+        
+        
+        setTimeout(function(){
+            
+            var newColor = '<input id="textcolor" type="color" name="textcolor" value="'+ self.rgb2hex(color)+'" />';
+            $('input[name=textcolor]').replaceWith(newColor);
+            var ffml = $e.css('font-family');
+            ffml = ffml.replace(/"/g,'');
+            select.val(ffml);
+
+        },100);
+        
+        
+
+    };
+    
+    
+    
+    this.SubmitTextStyle = function(e){
+      
+        var $e          = self.etc.find('.group-element.active');
+        var p           = $(e).closest('.pop-window');
+        var color       = p.find('#textcolor').val();
+        var lineHeight  = p.find('#textline').val();
+        var textSize    = p.find('#textsize').val();
+        var font        = p.find('select[name=fontfamily]').find('option:selected').val();
+        
+        if($e.length){
+            $e.css({
+                'color': color,
+                'line-height': lineHeight,
+                'font-size': textSize
+            });
+            
+            if(font){
+                $e.css({
+                    'font-family':font
+                });
+            } else {
+                $e.css({
+                    'font-family':'inherit'
+                });
+            }
+            
+            self.CancelPopWindow(e);
+            self.HistoryPushState();
+        }
+        
+        
+        
+    };
+    
 
     // <editor-fold defaultstate="collapsed" desc="EditText">
     this.EditText = function( e ){
@@ -1081,74 +1764,14 @@ var EditorClass = function(){
         ta.attr('id', id);
         
         var element = self.etc.find('.group-element.active');
+        var textHtml = element.html();
+        textHtml = textHtml.replace(/<br\s*[\/]?>/gi, "\n");
+        
         
         if(element.length){
-            ta.val(element.html());
+            ta.val(textHtml);
             ta.data('update', element.attr('id') );
         }
-        
-        tinymce.init({
-                selector: "#" + id,
-                height: 500,
-                force_br_newlines : true,
-                force_p_newlines : false,
-                forced_root_block : '',
-                plugins: [
-                  "advlist autolink autosave link image lists charmap print preview hr anchor pagebreak spellchecker",
-                  "searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking",
-                  "table contextmenu directionality emoticons template textcolor paste fullpage textcolor colorpicker textpattern"
-                ],
-
-                toolbar1: "newdocument fullpage | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | styleselect formatselect fontselect fontsizeselect",
-                toolbar2: "cut copy paste | searchreplace | bullist numlist | outdent indent blockquote | undo redo | link unlink anchor image media code | insertdatetime preview | forecolor backcolor",
-                toolbar3: "table | hr removeformat | subscript superscript | charmap emoticons | print fullscreen | ltr rtl | spellchecker | visualchars visualblocks nonbreaking template pagebreak restoredraft",
-
-                menubar: false,
-                toolbar_items_size: 'small',
-
-                style_formats: [{
-                  title: 'Bold text',
-                  inline: 'b'
-                }, {
-                  title: 'Red text',
-                  inline: 'span',
-                  styles: {
-                    color: '#ff0000'
-                  }
-                }, {
-                  title: 'Red header',
-                  block: 'h1',
-                  styles: {
-                    color: '#ff0000'
-                  }
-                }, {
-                  title: 'Example 1',
-                  inline: 'span',
-                  classes: 'example1'
-                }, {
-                  title: 'Example 2',
-                  inline: 'span',
-                  classes: 'example2'
-                }, {
-                  title: 'Table styles'
-                }, {
-                  title: 'Table row 1',
-                  selector: 'tr',
-                  classes: 'tablerow1'
-                }],
-
-                templates: [{
-                  title: 'Test template 1',
-                  content: 'Test 1'
-                }, {
-                  title: 'Test template 2',
-                  content: 'Test 2'
-                }],
-                content_css: [
-                  /*'//fast.fonts.net/cssapi/e6dc9b99-64fe-4292-ad98-6974f93cd2a2.css',
-                  '//www.tinymce.com/css/codepen.min.css'*/
-                ]
-        });
         
     };
     // </editor-fold>
@@ -1159,6 +1782,13 @@ var EditorClass = function(){
         var $html = self.PopWindow(html.title, html.content, html.size, html.buttons);
     };
     // </editor-fold>   
+    
+    // <editor-fold defaultstate="collapsed" desc="EditDiv">
+    this.EditDiv = function(){
+        var html = self.CloneTemplate('div');
+        var $html = self.PopWindow(html.color, html.content, html.size, html.buttons);
+    };
+    // </editor-fold> 
     
     // <editor-fold defaultstate="collapsed" desc="EditVideo">
     this.EditVideo = function(){
@@ -1232,26 +1862,44 @@ var EditorClass = function(){
                 }
             }
             self.CancelPopWindow(e);
+            self.HistoryPushState();
         }
     };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="SubmitText">
     this.SubmitText = function( e ){
-        tinyMCE.triggerSave();
+        //tinyMCE.triggerSave();
         var t = $(e).closest('.pop-window').find('textarea[name=text]');
         var id = self.UUID();
+        var align;
+        try{
+            align= $(e).closest('.pop-window').find('input[name=align]:checked').val();
+        } catch(eee){
+            align = "left";
+        }
+        
+        var txt = t.val();
+        txt = txt.replace(/\n/gi, "<br />");
         
         if(t.data('update')){
             
-            $('body').find('#' + t.data('update')).html(t.val());
+            
+            
+            $('body').find('#' + t.data('update')).html(txt);
             
         } else {
-        
-            var element = $('<div id="'+id+'" class="group-element" data-action="Editor.EditText">'+t.val()+'</div>');
+            var element = $('<div id="'+id+'" class="group-element" data-action="Editor.EditText">'+txt+'</div>');
             self.AddElement(element);
         }
+        
+         var $e = self.etc.find('.group-element.active');
+        
+        $e.css('text-align',align);
+        
+        
         self.CancelPopWindow(e);
+        self.HistoryPushState();
     };
     // </editor-fold>
     
@@ -1282,6 +1930,7 @@ var EditorClass = function(){
         }
         
         self.CancelPopWindow(e);
+        self.HistoryPushState();
         
     };
     // </editor-fold>
@@ -1320,16 +1969,60 @@ var EditorClass = function(){
              Element.src = url;
              
         self.CancelPopWindow(e);
+        self.HistoryPushState();
+    };
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="SubmitDiv">
+    this.SubmitDiv = function(e){
+        
+         var color = $(e).closest('.pop-window').find('input[name=bgcolor]').val();
+         
+         var element = self.etc.find('.group-element.active');
+        
+        if(element.length){
+            
+            var s = element.find('.editable-div');
+            s.css('background-color',color);
+            
+        } else {
+         
+            var Element = document.createElement('div');
+                Element.className += "editable-div";
+                Element.style.backgroundColor = color;
+                Element.style.width = 100 + 'px';
+                Element.style.height = 100 + 'px';
+                Element.innerHTML = '&nbsp;';
+                var id = self.UUID();
+             
+                var el = $('<div id="'+id+'" class="group-element" data-action="Editor.EditDiv">'+Element.outerHTML+'</div>');
+                self.AddElement(el);
+        
+        }
+        self.CancelPopWindow(e);
+        self.HistoryPushState();
     };
     // </editor-fold>
 
     // <editor-fold defaultstate="collapsed" desc="AddElement">
     this.AddElement = function( element, s){
-      
+        
         var $e = $(element);
         
         if(! s) {
+            
+            var z = 5;
+            $('#designer-editor').find('.group-element').each(function(){
+                var z2 = $(this).css('z-index');
+                if(z < z2)
+                    z = z2;
+            });
+            
+            z=z+1
+            
             self.etc.append(element);
+            element.css('top',$(window).scrollTop());
+            element.css('z-index',z);
             self.HistoryPushState();
         }
         else  {
@@ -1354,6 +2047,7 @@ var EditorClass = function(){
         var t = '.template-' + target;
         
         var html = {
+            'color': null,
             'content' : null,
             'title' : null,
             'size' : null,
@@ -1362,6 +2056,7 @@ var EditorClass = function(){
         
         html.content = $('.templates ' + t).clone();
         html.title = $('.templates ' + t).data('title');
+        html.color = $('.templates ' + t).data('color');
         html.size = $('.templates ' + t).data('size');
         html.buttons = $('.templates '+t+' .template-buttons');
         html.content.find('.template-buttons').remove(); 
@@ -1396,6 +2091,10 @@ var EditorClass = function(){
     // <editor-fold defaultstate="collapsed" desc="SaveProject">
     this.SaveProject = function(){
         
+        $('body').find('.group-element').each(function(){
+            self.ElementUnbind($(this));
+        });
+        
         if( $(this).attr('id') == 'btnsn'){
             self.projectId = null;
         }
@@ -1408,29 +2107,65 @@ var EditorClass = function(){
             $t,
             _title;
     
+        var fonts = self.fonts;
+    
         self.etc.find('.grid').remove();
         self.grid = null;
         self.gridIndx = 0;
 
         $.each(self.resolutions, function(i,e){
+            
+            
+            
             saved[i] = {
                 'width' : 0,
                 'height': 0,
                 'json' : null,
             };
             
+             var def = self.resolutions['desktop'];
+                $.each(self.resolutions, function(i,e){
+                    if(parseInt(e.width) == 0){
+                        switch (i){
+                            case 'desktop':
+                                self.resolutions['desktop'].width = 1120;
+                            break;
+                            case 'tablet':
+                                self.resolutions['tablet'].width = 1024;
+                            break;
+                            case 'mobile-hd':
+                                self.resolutions['mobile-hd'].width = 768;
+                            break;
+                            case 'mobile':
+                                self.resolutions['mobile'].width = 480;
+                            break;
+                            case 'mobile-small':
+                                self.resolutions['mobile-small'].width = 340;
+                            break;
+                        }
+                    }
+                    if(parseInt(e.height) == 0){
+                        self.resolutions[i].height = def.height;
+                    }
+                });
+            
             indx = e.hisindx;
             if(indx < 0) indx = 0;
-            obj = e.history[indx];
-            
-            if(obj == undefined){ obj = e.history[indx-1];}
-            
-            if(obj !== undefined){
-                obj.find('.grid').remove();
-                obj.find('.active').removeClass('active');
-                saved[i].width = e.width;
-                saved[i].height = e.height;
-                saved[i].json = obj[0].outerHTML;
+            try {
+                obj = e.history[indx];
+
+                if(obj == undefined){ obj = e.history[indx-1];}
+
+                if(obj !== undefined){
+                   /* obj.find('.ui-resizable-handle').remove();*/
+                    obj.find('.grid').remove();
+                    obj.find('.active').removeClass('active');
+                    saved[i].width = e.width;
+                    saved[i].height = e.height;
+                    saved[i].json = obj[0].outerHTML;
+                }
+            } catch(eee){
+                
             }
         });
         
@@ -1454,7 +2189,7 @@ var EditorClass = function(){
         
         btn.addClass('disabled').prop('disabled','disabled');
 
-        $.post(btn.data('url'), { json:jsonString, id:self.projectId, title:_title }, function(response){
+        $.post(btn.data('url'), { json:jsonString, id:self.projectId, title:_title, 'fonts':fonts }, function(response){
 
                self.EnableEditor();
 
@@ -1467,6 +2202,10 @@ var EditorClass = function(){
                $('#ModalTitle').html(response.title);
                $('#ModalText').html(response.message);
                $('#Modal').modal('show');
+               
+               $('body').find('.group-element').each(function(){
+                    self.ElementBind($(this));
+                });
 
        });
     };
@@ -1474,6 +2213,8 @@ var EditorClass = function(){
     
     // <editor-fold defaultstate="collapsed" desc="LoadProject">
     this.LoadProject = function(){
+        
+        
         
         var id =  self.etc.data('id');
         var url = self.etc.data('url');
@@ -1484,18 +2225,79 @@ var EditorClass = function(){
         
         $.post( url, {'id':id}, function(response){
             
-            
-            
             if( response.status == false ){
                 
                 $('#ModalTitle').html(response.title);
                 $('#ModalText').html(response.message);
                 $('#Modal').modal('show');
+
                 
                 self.EnableEditor();
                 
                 return false;
             }
+            
+                            
+            try{
+                                
+                self.fonts = response.fonts;
+                
+                
+                var holder = $('#fonts-holder');
+                holder.html('');
+
+                
+                if(self.fonts){
+                    try {
+                        var string = JSON.parse(self.fonts);
+                        $.each(string, function(i,m){
+
+                             holder.append('<link href="'+m.link+'" rel="stylesheet">');
+
+                        });
+
+                    }catch(eee){ console.log(eee);}
+                }
+                
+                
+                obj = JSON.parse(response.json);
+                $.each(obj, function(type,sada){
+                    self.resolutions[type].width = sada.width;
+                    self.resolutions[type].height = sada.height;
+                    if(type == 'desktop'){
+                         $('#width').val(sada.width).trigger('change');
+                         $('#height').val(sada.height).trigger('change');
+                    }
+                });
+            } catch ( ee ){
+                console.log('error: ' + ee);
+            }
+            
+            var def = self.resolutions['desktop'];
+            $.each(self.resolutions, function(i,e){
+                if(parseInt(e.width) == 0){
+                    switch (i){
+                        case 'desktop':
+                            self.resolutions['desktop'].width = 1120;
+                        break;
+                        case 'tablet':
+                            self.resolutions['tablet'].width = 1024;
+                        break;
+                        case 'mobile-hd':
+                            self.resolutions['mobile-hd'].width = 768;
+                        break;
+                        case 'mobile':
+                            self.resolutions['mobile'].width = 480;
+                        break;
+                        case 'mobile-small':
+                            self.resolutions['mobile-small'].width = 340;
+                        break;
+                    }
+                }
+                if(parseInt(e.height) == 0){
+                    self.resolutions[i].height = def.height;
+                }
+            });
             
             $('body').find('input[name=title]').val(response.title);
             
@@ -1511,11 +2313,53 @@ var EditorClass = function(){
     // <editor-fold defaultstate="collapsed" desc="ParseJson">
     this.ParseJson = function(json){
       
-        obj = JSON.parse( json );
+       obj = JSON.parse( json );
+        
+       if(!obj['tablet'].json)
+       {
+            obj['tablet'] = obj['desktop'];
+            obj['tablet'].width = 1024;
+       }
+       
+       if(!obj['mobile-hd'].json)
+       {
+            obj['mobile-hd'] = obj['desktop'];
+            obj['mobile-hd'].width = 768;
+       }
+       
+       if(!obj['mobile'].json)
+       {
+            obj['mobile'] = obj['desktop'];
+            obj['mobile'].width = 480;
+       }
+       
+       if(!obj['mobile-small'].json)
+       {
+            obj['mobile-small'] = obj['desktop'];
+            obj['mobile-small'].width = 340;
+       }
+        
+       
         
         $.each(obj, function(i,e){
+            
+            try {
+                self.resolutions[i]['history'][0];
+            } catch(eee){
+
+      
+                self.resolutions[i]['history'] = {};
+            }
+        
+            
+            
+            if(e.height == 0){
+                e.height = obj.desktop.height;
+            }
+            
+            
             if(e.width > 0 && e.height > 0){
-                
+          
                 self.resolutions[i]['history'][0]   = $(e.json);
                 self.resolutions[i].width           = e.width;
                 self.resolutions[i].height          = e.height;
@@ -1527,8 +2371,12 @@ var EditorClass = function(){
                 }
             }
         });
+
         
         setTimeout(function(){
+            
+            $('.resolution select').val('desktop').trigger('change');
+            
             self.Refresh();
             setTimeout(function(){
                 self.EnableEditor();

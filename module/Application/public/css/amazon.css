@@ -341,3 +341,42 @@ input:disabled {
     color:#333;
     border: solid 1px #eee;
 }
+
+.code-console {
+    display:none;
+    font-size:11px;
+}
+.code-console pre {
+    font-size:11px;
+    word-break: break-all;
+}
+.code-console.active {
+    display:block;
+}
+
+.searchbar {
+    display:block;
+    position: relative;
+    padding: 10px 0;
+    margin: 0 0 10px 0;
+}
+
+#keywords, #date {
+    display:block;
+    padding: 5px;
+    font-size:13px;
+    border: none;
+    border-bottom: solid 1px #000;
+    outline: none;
+}
+
+#keywords { width:200px;}
+#date { width: 100px; }
+
+.filter-alert {
+    display: block;
+    padding: 0 0 5px 0;
+    text-align: center;
+    font-size:12px;
+    color:red;
+}

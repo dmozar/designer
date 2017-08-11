@@ -56,6 +56,7 @@ return $config = [
      * ----------------------------------------------
      */
     'modules' => [
+        'Imedia\Pages'              => PATH_ROOT . 'vendor/imedia/pages/src/',
         'Imedia\Designer'           => PATH_ROOT . 'vendor/imedia/designer/src/',
         'Imedia\User'               => PATH_ROOT . 'vendor/imedia/user/src/',
         'Imedia\Proxy'              => PATH_ROOT . 'vendor/imedia/proxy/src/',
@@ -113,7 +114,7 @@ return $config = [
             'rangy-classapplier.js'   => __DIR__ . '/../public/js/rangy/rangy-classapplier.js',
             'rangy-highlighter.js'    => __DIR__ . '/../public/js/rangy/rangy-highlighter.js',
             'rangy-textrange.js'      => __DIR__ . '/../public/js/rangy/rangy-textrange.js',
-            
+            'jquery.cookie.js'        => __DIR__ . '/../public/js/jquery.cookie.js',
             'ajaxform.js'             => __DIR__ . '/../public/js/jquery.form.js',
             'bootstrap.js'            => __DIR__ . '/../public/js/bootstrap.js',  
             'bootstrap.slider.js'     => __DIR__ . '/../public/js/bootstrap-slider.min.js',

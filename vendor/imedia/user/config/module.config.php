@@ -101,6 +101,7 @@ return [
         'registration'  => __DIR__ . '/../view/master/registration.phtml',
         'error'         => __DIR__ . '/../view/master/error.phtml',
         'success'       => __DIR__ . '/../view/master/success.phtml',
+        'successreg'    => __DIR__ . '/../view/master/successreg.phtml'
     ],
     'view_helpers' => [
         'LoginHelper'           => 'Imedia\User\View\LoginHelper',

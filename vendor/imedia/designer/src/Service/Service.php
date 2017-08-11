@@ -209,7 +209,7 @@ class Service implements ServiceInterface {
      * @param type $id
      * @return type
      */
-    public function Save( $output, $json, $title, $id = null ){
+    public function Save( $output, $json, $title, $id = null, $fonts = null ){
         
         if( ! $Design = $this->getDesign( $id ) ) return $output;
         
@@ -217,6 +217,7 @@ class Service implements ServiceInterface {
         
         $Design->setjson( $json );
         $Design->setTitle( $title );
+        $Design->setFonts( $fonts );
         
         $em = $this->getEntityManager();
         $em->persist( $Design );
@@ -253,6 +254,7 @@ class Service implements ServiceInterface {
         $output['message']  = null;
         $output['status']   = true;
         $output['id']       = $Design->getID();
+        $output['fonts']    = $Design->getFonts();
         
         return $output;
     }
@@ -261,6 +263,6 @@ class Service implements ServiceInterface {
      * 
      * @return type
      */
-    public function getListItems(){ return $this->getRepository()->setOptions(['offset'=>$this->getOffset(),'limit'=>$this->getLimit()])->getListItems(); }
+    public function getListItems( $options = null ){ return $this->getRepository()->setOptions(['offset'=>$this->getOffset(),'limit'=>$this->getLimit()])->getListItems( $options ); }
 
 }

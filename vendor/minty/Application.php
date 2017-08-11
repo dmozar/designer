@@ -225,11 +225,13 @@ class Application extends ServiceLocator {
             $masterConfigs = include ($moduleConfigs['master']);
             if(isset($masterConfigs['sessKey']))
                 $sessKey = $masterConfigs['sessKey'];
+            
+            if(isset($moduleConfigs['sessKey'])){
+                $sessKey = $masterConfigs['sessKey'];
+            }
         }
         
-        if(isset($moduleConfigs['sessKey'])){
-            $sessKey = $masterConfigs['sessKey'];
-        }
+        
         
         if($request->controller !== 'Imedia\User\Controller\UserController' && $request->method !== 'login' && $sessKey && $request->method !== 'logout'){
             $session_key = ($sessKey);

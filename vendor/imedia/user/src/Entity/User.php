@@ -50,7 +50,9 @@ class User {
 
     
     public function __construct() {
-
+        $this->type     = 2;
+        $this->status   = 0;
+        $this->admin    = 0;
     }
     
     public function getID(){ return $this->id; }

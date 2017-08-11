@@ -27,6 +27,9 @@ class Design {
     /** @ORM\Column(type="text", nullable=false) */
     public $json;
     
+    /** @ORM\Column(type="text", nullable=false) */
+    public $fonts;
+    
     /** @ORM\Column(type="datetime", nullable=false) */
     public $created;
     
@@ -68,5 +71,8 @@ class Design {
     public function getUrl(){ return Router::FromChilde('Imedia\Designer', 'index','item',[], [$this->id]); }
     public function getRemoveUrl(){ return Router::FromRoute('Imedia\Designer', 'remove', [$this->id]); }
     public function getRemoveConfirmedUrl(){ return Router::FromChilde('Imedia\Designer', 'remove', 'confirmed', [$this->id]); }
+    
+    public function setFonts($string = null){ $this->fonts = $string; }
+    public function getFonts(){ return $this->fonts; }
     
 }

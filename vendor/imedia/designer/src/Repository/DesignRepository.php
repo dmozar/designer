@@ -54,7 +54,7 @@ class DesignRepository extends EntityRepository {
      * 
      * @return Paginator
      */
-    public function getListItems(){
+    public function getListItems( $options = null ){
         
         if( ! $User = $this->options['user'] ) return null;
         
@@ -67,6 +67,20 @@ class DesignRepository extends EntityRepository {
         
         $qb->setFirstResult( $this->options['offset'] );
         $qb->setMaxResults( $this->options['limit'] );
+        $qb->orderBy('d.id','DESC');
+        
+        if( $options ){
+            
+            if(isset($options->keywords)){
+                $qb->andWhere('d.title like :title')->setParameter('title', '%'.$options->keywords.'%');
+            }
+            
+            if(isset($options->date)){
+                
+                $qb->andWhere('DATE_FORMAT(d.created,\'%d.%m.%Y\') like :date')->setParameter('date', '%'.$options->date.'%');
+            }
+            
+        }
         
         $query = $qb->getQuery(); 
         

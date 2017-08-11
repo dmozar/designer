@@ -55,8 +55,13 @@ class RegistrationHelper extends AbstractView implements ViewInterface {
         $ViewModel =  $this->getView($options);
         $ViewModel->get('registration');
         
-        if( $options['submit'] )
+        if( $options['submit'] ) {
+            if( $Service->getRegUser()){
+                $ViewModel =  $this->getView($options);
+                $ViewModel->get('successreg');
+            }
             OutputManager::get()->view( $ViewModel );
+        }
         
         return $ViewModel;
         

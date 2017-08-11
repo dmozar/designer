@@ -1,3 +1,5 @@
+<div id="fonts-holder"></div>
+
 <div class="editor-box">
 <div class="editor-wrap">
     <div class="editor-controlls pinstart pinparent pintop" id="edd">
@@ -14,18 +16,68 @@
             <li id="ec-magic" class="ignore"><i class="fa fa-magic" aria-hidden="true"></i></li>
             <li id="ec-expand" class="ignore"><i class="fa fa-expand" aria-hidden="true"></i></li>
             <li id="ec-center" class="ignore"><i class="fa fa-align-center" aria-hidden="true"></i></li>
-            <li id="ec-grid" class="ignore"><i class="fa fa-th" aria-hidden="true"></i></li>
+            <li id="ec-div" class="ignore"><i class="fa fa-window-maximize" aria-hidden="true"></i></li>
+            <li id="ec-textstyle" class="disabled"><i class="fa fa-paint-brush" aria-hidden="true"></i></li>
+            <li id="ec-textfont" class="ignore"><i class="fa fa-graduation-cap" aria-hidden="true"></i></li>
+            <li id="ec-grid"><i class="fa fa-th" aria-hidden="true"></i></li>
         </ul>
         <span class="pin"><i class="fa fa-thumb-tack" aria-hidden="true"></i></span>
     </div>
 
     <div class="designer-box">
-        <div id="design-editor" class="editor noselect" spellcheck="false" data-id="<?=$this->id?>" data-url="<?=Minty\Router::FromRoute('Imedia\Designer', 'load')?>"></div>
+        <div data-fonts="" id="design-editor" class="editor noselect" spellcheck="false" data-id="<?=$this->id?>" data-url="<?=Minty\Router::FromRoute('Imedia\Designer', 'load')?>"></div>
     </div>
 
     
     <!-- Templates -->
     <div class="templates">
+        
+        <!-- Template Text Style -->
+        <div class="template-textfont" data-title="Fonts" data-size="medium">
+            <div class="form-group">
+                <label>Import fonts</label>
+                <textarea name="fontlist" style="width:100%;height:400px;"></textarea>
+                <em>Insert in format: https://fonts.googleapis.com/css?family=Saira+Extra+Condensed,Saira Extra Condensed</em>
+                <div><em>For new font insert new line</em></div>
+            </div>
+            
+            
+            
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitTextFont(this);">OK</button>
+            </div>
+        </div>
+        
+        
+        <div class="template-textstyle" data-title="Style Text" data-size="medium">
+            
+            <div class="form-group">
+                <label>Font Family</label>
+                <select name="fontfamily">
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Text Line Height</label>
+                <span style="width:90px;display:inline-block;"><input id="textline" type="text" name="textline" value="20px" /></span>
+            </div>
+            
+            <div class="form-group">
+                <label>Text Size</label>
+                <span style="width:90px;display:inline-block;"><input id="textsize" type="text" name="textsize" value="17px" /></span>
+            </div>
+            
+            <div class="form-group">
+                <label>Text Color</label>
+                <span style="width:90px;display:inline-block;"><input id="textcolor" type="color" name="textcolor" value="#000" /></span>
+            </div>
+            
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitTextStyle(this);">OK</button>
+            </div>
+        </div>
         
         <!-- Template Text -->
         <div class="template-text" data-title="Add/Edit Text" data-size="medium">
@@ -33,6 +85,15 @@
                 <label>Text</label>
                 <textarea name="text" class="editor-text" ></textarea>
             </div>
+            <div class="align-options">
+                <div>Text align:</div>
+                <form>
+                <span style="width:90px;display:inline-block;"><label for="aaaL">Left: <input id="aaaL" type="radio" name="align" value="left" checked /></label> </span>
+                <span style="width:90px;display:inline-block;"><label for="aaaC">Center: <input id="aaaC" type="radio" name="align" value="center" /> </label></span>
+                <span style="width:90px;display:inline-block;"><label for="aaaR">Right: <input id="aaaR" type="radio" name="align" value="right" /> </label></span> 
+                </form>
+            </div>
+            
             <div class="template-buttons">
                 <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
                 <button type="button" name="button-action" onclick="Editor.SubmitText(this);">OK</button>
@@ -80,6 +141,19 @@
             <div class="template-buttons">
                 <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
                 <button type="button" name="button-action" onclick="Editor.SubmitImage(this);">OK</button>
+            </div>
+        </div>
+        <!-- Template Image end /-->
+        
+        <!-- Template DIV -->
+        <div class="template-div" data-title="Add/Edit div" data-size="medium">
+            <div class="form-group">
+                <label>Background color</label>
+                <input type="color" name="bgcolor" value="" placeholder="#fff" maxlength="18"  />
+            </div>
+            <div class="template-buttons">
+                <button type="button" name="button-cancel" onclick="Editor.CancelPopWindow(this);">Cancel</button>
+                <button type="button" name="button-action" onclick="Editor.SubmitDiv(this);">OK</button>
             </div>
         </div>
         <!-- Template Image end /-->
@@ -133,6 +207,11 @@
         <?php endif;?> 
         <button id="btnsv" data-url="<?= Minty\Router::FromRoute('Imedia\Designer', 'save')?>" class="btn-btn btn-save-project pull-right" ><i class="fa fa-floppy-o" aria-hidden="true"></i> <?=language('SaveProject')?></button>
         <button id="btngc" class="btn-btn btn-get-code pull-right" ><i class="fa fa-code" aria-hidden="true"></i> <?=language('GenerateCode')?></button>
+    </div>
+    <div class="col-md-12">
+        <console class="code-console">
+            <pre id="generatedcode" contenteditable="true" spellcheck="false"></pre>
+        </console>
     </div>
 </div>
 

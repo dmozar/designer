@@ -1,6 +1,6 @@
 <ul class="pagination">
   <?php foreach ($options['pages'] as $page):?>  
-    <li class="<?=$options['page'] == $page ? 'active':''?>" ><a href="<?= sprintf($options['url'], $page)?>" ><?=$page?></a></li>
+    <li class="<?=$options['page'] == $page ? 'active':''?>" ><a href="<?= str_replace('00000000',$page,$options['url'] )?>" ><?=$page?></a></li>
   <?php endforeach; ?> 
 </ul>
 

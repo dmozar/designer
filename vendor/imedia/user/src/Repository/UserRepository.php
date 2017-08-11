@@ -63,7 +63,11 @@ class UserRepository extends EntityRepository {
 
         $query = $qb->getQuery();
         
-        return $query->getOneOrNullResult();
+        $result =  $query->getOneOrNullResult();
+        
+        
+        
+        return $result;
         
     }
     

@@ -59,6 +59,19 @@ class UserService implements ServiceInterface {
     private $error_value = null;
     
     
+    /**
+     *
+     * @var type 
+     */
+    private $User;
+    
+    
+    /**
+     *
+     * @var type 
+     */
+    private $RegUser;
+    
 
     /**
      * 
@@ -88,6 +101,14 @@ class UserService implements ServiceInterface {
         $Repository = DoctrineManager::get()->EntityManager()->getRepository('Imedia\User\Entity\User');
         return $Repository->getUser(/* options */);
     }
+    
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getRegUser(){ return $this->RegUser;}
+    
 
     /**
      * 
@@ -160,6 +181,22 @@ class UserService implements ServiceInterface {
         
         $user = new User;
         
+        if(isset($values['email'])){
+            $e = $values['email'];
+            $x = explode('@',$e);
+            $d = @$x[1];
+            
+            $array = [
+                'gigatron.rs',
+                'gigatronshop.com',
+                'gigatronshop.rs',
+                'popup.rs'
+            ];
+            
+            if( !in_array($d, $array)) return false;
+            
+        }
+        
         foreach ($values as $key => $value){
             
             switch ($key){
@@ -175,10 +212,15 @@ class UserService implements ServiceInterface {
         
         $em->persist( $user );
         
+        $this->RegUser = $user;
+        
         if( ! $em->flush()){
             return false;
         }
         
+        $this->login_user($values);
+        $url = (\Minty\Router::FromRoute('Imedia\Designer', 'index'));
+        redirect( $url );
         $this->message = language('UserRegisterSuccessfully');
         
         return true;

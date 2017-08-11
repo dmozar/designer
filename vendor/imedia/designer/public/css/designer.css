@@ -185,7 +185,7 @@
 .editor-controlls ul li {
     display:block;
     position: relative;
-    width: 72px;
+    width: 40px;
     height:36px;
     margin-top:-1px;
     margin-left:-1px;
@@ -250,10 +250,17 @@
     color:#fff;
 }
 
+.currcolor {
+    display:inline-block;
+    position: relative;
+    border:solid 1px #000;
+    width:25px;
+    height:25px;
+    top:4px;
+}
 
 .editor .group-element .editable-img {
-    width:100%;
-    height: 100%;
+    display:block;
 }
 
 .editor .group-element {
@@ -315,7 +322,7 @@
     right:auto;
     bottom:auto;
     top:auto;
-    padding-right: 160px;
+    padding-right: 50px;
     border-bottom: solid 1px #ccc;
 }
 
@@ -474,3 +481,4 @@
 .list-item-table th:last-child {
     text-align: center;
 }
+

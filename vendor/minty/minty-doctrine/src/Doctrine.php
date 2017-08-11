@@ -124,8 +124,8 @@ class DoctrineManager {
      * 
      */
     public function registerClassLoader(){
-
-        
+        $classLoader = new \Doctrine\Common\ClassLoader('DoctrineExtensions', PATH_ROOT.'vendor/beberlei/DoctrineExtensions/src/');
+        $classLoader->register();
     }
     
     
@@ -227,5 +227,10 @@ class DoctrineManager {
         ];
 
         $this->em = EntityManager::create( $db , $this->doctrineConfig); 
+        
+        $config = $this->em->getConfiguration();
+        $config->addCustomStringFunction('RAND', 'DoctrineExtensions\Query\Mysql\Rand');
+        $config->addCustomStringFunction('STRTODATE', 'DoctrineExtensions\Query\Mysql\StrToDate');
+        $config->addCustomStringFunction('DATE_FORMAT', 'DoctrineExtensions\Query\Mysql\DateFormat');
     }
 }

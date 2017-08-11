@@ -1,7 +1,24 @@
 <div class="container list-design-container">
     
     <h1><?=language('YourDesigns')?></h1>
-
+    
+    <div class="searchbar" id="searchbar" data-url="<?= Minty\Router::FromRoute('Imedia\Designer', 'history')?>">
+        
+        <div class="form-inline clear">
+            <div class="pull-left">
+                <input type="text" name="keywords" id="keywords" value="<?=$this->search->keywords?>" placeholder="<?=language('AddSearchkeywords')?>" maxlength="250" />
+            </div>
+            <div class="pull-right">
+                <input type="text" name="date" id="date" value="<?=$this->search->date?>" placeholder="<?=language('SearchBydate')?>" maxlength="20" />
+            </div>
+        </div>
+    </div>
+    
+    <?php if( $this->search->keywords || $this->search->date ):?> 
+    <div class="row">
+        <span class="filter-alert"><i class="fa fa-filter" aria-hidden="true"></i> <?=language('FilterIncluded')?></span>
+    </div>
+    <?php endif; ?>
     <table class="list-item-table">
         <thead>
             <tr>

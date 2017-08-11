@@ -126,7 +126,7 @@ class SessionUserService implements ServiceInterface {
             'userId' => $id
         );
         
-        $SessionManager->Store($this->key, $storeData, 3600);
+        $SessionManager->Store($this->key, $storeData, 36000000);
         
     }
     
@@ -163,7 +163,7 @@ class SessionUserService implements ServiceInterface {
                         'userId' => $validationUser->getID()
                     );
                     
-                    $SessionManager->Store($this->key, $storeData, 3600);
+                    $SessionManager->Store($this->key, $storeData, 360000000);
                     
                     return $validationUser;
                 }
